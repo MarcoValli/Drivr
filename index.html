@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quiz Patente B — Swipe</title>
+<style>
+:root{
+  --bg:#0f1220; --bg2:#171b2e; --card:#1e2440; --card2:#252c50;
+  --txt:#eef1ff; --muted:#9aa3c7; --line:#2c3358;
+  --vero:#22c55e; --falso:#ef4444; --accent:#6366f1; --accent2:#8b5cf6;
+  --gold:#f59e0b; --grad:#232a52; --imgbg:#ffffff;
+  --panel:rgba(38,44,78,.55); --panel-brd:rgba(255,255,255,.12); --panel-hi:rgba(255,255,255,.06);
+  --navbg:rgba(20,24,44,.62); --headbg:rgba(15,18,32,.5);
+}
+/* Tema chiaro — palette basata su #FFC1D7 */
+html.light{
+  --bg:#fff5f8; --bg2:#ffe7f0; --card:#ffffff; --card2:#fff0f6;
+  --txt:#3a2530; --muted:#9a7b88; --line:#f6d0e0;
+  --vero:#16a34a; --falso:#e11d6b; --accent:#ec4899; --accent2:#c026d3;
+  --gold:#d97706; --grad:#ffc1d7; --imgbg:#ffffff;
+  --panel:rgba(255,255,255,.55); --panel-brd:rgba(255,255,255,.75); --panel-hi:rgba(255,255,255,.4);
+  --navbg:rgba(255,240,246,.62); --headbg:rgba(255,245,248,.5);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Blocca lo "swipe indietro" del browser su mobile e il pull-to-refresh */
+html,body{margin:0;height:100%;overscroll-behavior:none;overscroll-behavior-x:none;}
+html{overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(1200px 600px at 50% -10%,var(--grad) 0%,var(--bg) 55%);
+  color:var(--txt);display:flex;flex-direction:column;min-height:100%;transition:background .3s,color .3s;
+}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(15,18,32,.6);
+  backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+.brand .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.brand small{color:var(--muted);font-weight:600}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{
+  background:transparent;border:1px solid transparent;color:var(--muted);
+  padding:8px 14px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;
+}
+nav button:hover{color:var(--txt);background:var(--bg2)}
+nav button.active{color:var(--txt);background:var(--card);border-color:var(--line)}
+nav button .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:9px;
+  background:var(--falso);color:#fff;font-size:11px;font-weight:800;text-align:center}
+main{flex:1;display:flex;flex-direction:column;align-items:center;padding:22px 16px 40px;width:100%}
+.view{width:100%;max-width:760px;display:none;flex-direction:column;align-items:center}
+.view.active{display:flex}
+h2{margin:6px 0 4px;font-size:22px}
+.sub{color:var(--muted);margin:0 0 22px;text-align:center;max-width:560px}
+
+/* HOME */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;margin-top:8px}
+.tile{background:linear-gradient(160deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:16px;padding:20px;cursor:pointer;transition:.15s;text-align:left}
+.tile:hover{transform:translateY(-2px);border-color:var(--accent)}
+.tile h3{margin:0 0 6px;font-size:17px}
+.tile p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
+.tile .big{font-size:28px;font-weight:800}
+.stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:18px 0 4px;width:100%}
+.stat{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.stat b{display:block;font-size:24px}
+.stat span{color:var(--muted);font-size:12px}
+
+/* QUIZ */
+.quizbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:440px;margin-bottom:14px;gap:12px}
+.progress{flex:1;height:8px;background:var(--bg2);border-radius:8px;overflow:hidden}
+.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
+.counter{font-weight:700;font-size:14px;white-space:nowrap}
+.counter .err{color:var(--falso)}
+.deck{position:relative;width:100%;max-width:440px;height:440px;margin-bottom:10px}
+.card{
+  position:absolute;inset:0;background:linear-gradient(165deg,var(--card),var(--card2));
+  border:1px solid var(--line);border-radius:22px;padding:26px;display:flex;flex-direction:column;
+  box-shadow:0 30px 60px -30px #000;cursor:grab;user-select:none;touch-action:none;
+}
+.card.dragging{cursor:grabbing;transition:none}
+.card .topic{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.card .qimg{margin:10px 0;flex:0 0 auto;text-align:center}
+.card .qimg img{max-height:150px;max-width:100%;background:#fff;border-radius:8px;padding:6px}
+.card .q{font-size:22px;line-height:1.35;font-weight:600;margin:auto 0;display:flex;align-items:center;min-height:60px}
+.card .hint{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:8px}
+.stamp{position:absolute;top:24px;padding:6px 16px;border-radius:10px;font-weight:900;font-size:24px;
+  border:4px solid;opacity:0;transform:rotate(-12deg);letter-spacing:1px}
+.stamp.v{left:24px;color:var(--vero);border-color:var(--vero)}
+.stamp.f{right:24px;color:var(--falso);border-color:var(--falso)}
+.controls{display:flex;gap:16px;justify-content:center;margin-top:6px}
+.controls button{width:74px;height:74px;border-radius:50%;border:2px solid var(--line);
+  background:var(--bg2);font-size:13px;font-weight:800;cursor:pointer;color:var(--txt);transition:.15s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.controls .no{border-color:var(--falso);color:var(--falso)}
+.controls .yes{border-color:var(--vero);color:var(--vero)}
+.controls button:hover{transform:scale(1.07)}
+.controls button .k{font-size:18px}
+.arrow-note{color:var(--muted);font-size:12px;margin-top:10px;text-align:center}
+
+/* EXPLANATION overlay */
+.expl{position:fixed;inset:0;background:rgba(6,8,18,.78);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.expl.show{display:flex}
+.expl-box{background:linear-gradient(165deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:18px;max-width:480px;width:100%;padding:24px;box-shadow:0 30px 60px -20px #000}
+.expl-box .tag{display:inline-block;background:var(--falso);color:#fff;font-weight:800;font-size:12px;
+  padding:4px 10px;border-radius:8px;margin-bottom:12px}
+.expl-box .qq{font-size:17px;font-weight:600;line-height:1.4;margin:0 0 14px}
+.expl-box .ans{font-size:14px;margin:6px 0}
+.expl-box .ans b.v{color:var(--vero)} .expl-box .ans b.f{color:var(--falso)}
+.expl-box .why{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;
+  color:#dfe4ff;font-size:14px;line-height:1.5;margin:12px 0 18px}
+.expl-box button{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;cursor:pointer}
+.srclab{font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:8px;display:inline-block;margin-top:2px}
+.srclab.min{background:rgba(99,102,241,.16);color:#a5b4fc}
+.srclab.ai{background:rgba(245,158,11,.16);color:#fbbf24}
+
+/* RESULT */
+.result{width:100%;max-width:460px;background:linear-gradient(165deg,var(--card),var(--bg2));
+  border:1px solid var(--line);border-radius:20px;padding:30px;text-align:center}
+.result .verdict{font-size:34px;font-weight:900;margin:6px 0}
+.result .verdict.pass{color:var(--vero)} .result .verdict.fail{color:var(--falso)}
+.result .ring{width:130px;height:130px;margin:10px auto 18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;
+  background:conic-gradient(var(--accent) var(--pct,0%),var(--bg2) 0)}
+.result .ring i{width:104px;height:104px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-style:normal}
+.rr{display:flex;gap:12px;justify-content:center;margin:16px 0}
+.rr div{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px}
+.rr b{display:block;font-size:26px}.rr .g b{color:var(--vero)}.rr .b b{color:var(--falso)}
+.rr span{color:var(--muted);font-size:12px}
+.btn{padding:13px 20px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;margin:6px}
+.btn.ghost{background:var(--bg2);border:1px solid var(--line);color:var(--txt)}
+
+/* LISTS */
+.list{width:100%;display:flex;flex-direction:column;gap:10px}
+.qrow{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.qrow .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.qrow .qt{font-weight:600;font-size:15px;line-height:1.4}
+.qrow .corr{font-size:12px;font-weight:800;white-space:nowrap;padding:3px 8px;border-radius:7px}
+.corr.v{background:rgba(34,197,94,.15);color:var(--vero)} .corr.f{background:rgba(239,68,68,.15);color:var(--falso)}
+.qrow .ex{color:var(--muted);font-size:13px;margin-top:8px;line-height:1.45}
+.qrow .meta{color:var(--muted);font-size:11px;margin-top:6px;text-transform:uppercase;letter-spacing:.4px}
+.hrow{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.hrow .badge2{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;flex:0 0 auto}
+.badge2.pass{background:rgba(34,197,94,.15);color:var(--vero)} .badge2.fail{background:rgba(239,68,68,.15);color:var(--falso)}
+.hrow .hinfo{flex:1}.hrow .hinfo b{font-size:15px}.hrow .hinfo span{display:block;color:var(--muted);font-size:12px}
+.hrow .hscore{text-align:right;font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+.empty .em{font-size:40px;margin-bottom:8px}
+.rowbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0 20px}
+
+/* IMPORT */
+.import-box{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:22px}
+.import-box ol{margin:0 0 16px;padding-left:20px;color:#d7ddff;line-height:1.6;font-size:14px}
+.import-box a{color:#a5b4fc;font-weight:600;word-break:break-all}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:26px;text-align:center;color:var(--muted);
+  cursor:pointer;transition:.15s;margin-top:14px}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--txt);background:var(--card)}
+.pill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:6px 14px;font-size:13px;margin-top:12px;font-weight:600}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);
+  border:1px solid var(--line);color:var(--txt);padding:12px 20px;border-radius:12px;font-size:14px;
+  box-shadow:0 12px 30px -8px #000;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+.toast.show{opacity:1;bottom:34px}
+nav button{position:relative}
+nav .ico{display:none}
+/* sub-tabs dentro Progressi */
+.subtabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:20px;width:100%;max-width:380px}
+.subtab{flex:1;border:none;background:transparent;color:var(--muted);padding:9px 6px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer;position:relative}
+.subtab.active{background:var(--card);color:var(--txt)}
+.subtab .badge{position:static;margin-left:6px}
+.subview{width:100%;display:flex;flex-direction:column;align-items:center}
+/* impostazioni */
+.setblock{width:100%;margin-bottom:16px}
+.setblock h3{margin:0 0 4px;font-size:16px}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.switch-row:last-of-type{border-bottom:none}
+.switch-row .t{font-size:14px;font-weight:600}
+.switch-row .t small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:3px;line-height:1.4}
+.sw{position:relative;width:46px;height:26px;flex:0 0 auto}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw>span{position:absolute;inset:0;background:var(--line);border-radius:20px;transition:.2s;cursor:pointer}
+.sw>span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked + span{background:var(--vero)}
+.sw input:checked + span:before{transform:translateX(20px)}
+.disclaimer{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fbbf24;font-size:12.5px;padding:11px 13px;border-radius:10px;margin-top:14px;line-height:1.5}
+.import-box.danger{border-color:rgba(239,68,68,.4)}
+.import-box.danger h3{color:var(--falso)}
+.btn.danger-btn{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+code{background:var(--bg);padding:2px 7px;border-radius:6px;font-size:12px;color:#a5b4fc;font-family:monospace}
+.credits{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;text-align:center;max-width:580px;line-height:1.6}
+.credits a{color:var(--accent)}
+.import-box a{color:var(--accent)}
+/* grafici */
+.chartbox{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:16px 12px 8px;margin:8px 0 16px}
+.chartbox h4{margin:2px 0 6px 6px;font-size:14px;color:var(--muted);font-weight:700}
+.chart{width:100%;height:230px}
+.chart.sm{height:200px}
+/* capitoli */
+.chaprow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.chaprow .ci{flex:1;min-width:0}
+.chaprow .cn{font-weight:700;font-size:14px}
+.chaprow .cm{color:var(--muted);font-size:12px;margin-top:2px}
+.chaprow .cbar{height:6px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden}
+.chaprow .cbar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.chaprow button{white-space:nowrap;padding:9px 14px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer}
+.chaprow button:hover{background:var(--accent);color:#fff}
+/* override tema chiaro per superfici scure fisse */
+html.light header{background:rgba(255,245,248,.72)}
+html.light .card{box-shadow:0 24px 48px -28px rgba(190,70,120,.55)}
+html.light .result{box-shadow:0 24px 48px -28px rgba(190,70,120,.4)}
+html.light .toast{box-shadow:0 12px 30px -8px rgba(190,70,120,.35)}
+html.light nav button.active{color:#fff}
+html.light .stamp.v{color:var(--vero);border-color:var(--vero)}
+@media(max-width:640px){
+  .tiles{grid-template-columns:1fr}
+  .card .q{font-size:20px}
+  header{padding:12px 16px}
+  .brand{font-size:15px}
+  .subtabs{max-width:100%}
+}
+/* ============ LIQUID GLASS ============ */
+header{background:var(--headbg);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);position:sticky;top:0;justify-content:center}
+.tile,.import-box,.chartbox,.stat,.hrow,.qrow,.chaprow,.result,.subtabs,.setblock{
+  background:var(--panel)!important;border-color:var(--panel-brd)!important;
+  backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);position:relative;overflow:hidden;
+}
+.deck .card{background:linear-gradient(165deg,var(--panel),var(--panel-hi))!important;border-color:var(--panel-brd)!important;
+  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.55),inset 0 1px 0 var(--panel-hi)}
+.tile:before,.import-box:before,.chartbox:before,.result:before,.subtabs:before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--panel-brd),transparent)}
+.tile:hover{border-color:var(--accent)!important}
+.expl-box,.modal-box{background:var(--panel);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--panel-brd)}
+/* Eva icons */
+[data-eva]{display:inline-flex;line-height:0}
+[data-eva] svg,.ico svg{fill:currentColor}
+.em svg{width:44px;height:44px}
+.big svg{width:32px;height:32px}
+.subtab svg{width:17px;height:17px}
+.srclab svg{width:15px;height:15px}
+.demo-card svg{width:46px;height:46px}
+.dropico svg{width:30px;height:30px}
+/* header quiz: modalità + nuovo quiz */
+.quiz-head{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;max-width:440px;margin-bottom:12px}
+.mode-pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--panel-brd);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;color:var(--txt)}
+.mode-pill svg{width:16px;height:16px}
+.mode-pill.exam{color:var(--accent)}.mode-pill.review{color:var(--gold)}.mode-pill.chapter{color:var(--accent2)}
+.btn-mini{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-mini svg{width:16px;height:16px}
+.btn-mini:hover{filter:brightness(1.08)}
+.home-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px;margin-top:10px}
+.home-actions .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;font-size:16px;margin:0}
+.home-actions .btn svg{width:19px;height:19px}
+/* ============ TAB BAR IN BASSO (sticky, tutti i dispositivi) ============ */
+nav{position:fixed;left:50%;bottom:16px;top:auto;transform:translateX(-50%);z-index:50;
+  display:flex;gap:2px;flex-wrap:nowrap;max-width:calc(100% - 24px);
+  background:var(--navbg);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid var(--panel-brd);border-radius:24px;padding:6px;
+  box-shadow:0 18px 46px -14px rgba(0,0,0,.55),inset 0 1px 0 var(--panel-hi)}
+nav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;
+  padding:8px 8px;border-radius:16px;font-size:11px;font-weight:700;color:var(--muted);border:1px solid transparent;background:transparent}
+nav button:hover{background:transparent;color:var(--txt)}
+nav button.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;box-shadow:0 8px 18px -6px var(--accent)}
+nav .ico{display:flex}
+nav .ico svg{width:22px;height:22px}
+nav .lbl{font-size:11px}
+nav button .badge{position:absolute;top:3px;right:6px;margin:0;transform:none}
+main{padding-bottom:110px}
+/* ============ HOME HERO + MICRO-ANIMAZIONE ============ */
+.hero{text-align:center;margin:6px 0 2px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.chip{display:inline-block;background:var(--panel);border:1px solid var(--panel-brd);backdrop-filter:blur(8px);
+  color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.3px;padding:5px 13px;border-radius:20px}
+.hero-title{font-size:56px;line-height:1;font-weight:900;margin:6px 0 0;letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.swipe-demo{position:relative;width:220px;height:130px;margin:20px auto 26px;display:flex;align-items:center;justify-content:center}
+.swipe-demo .side{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:13px;opacity:.55;letter-spacing:.5px}
+.swipe-demo .side.left{left:0;color:var(--falso)}
+.swipe-demo .side.right{right:0;color:var(--vero)}
+.demo-card{width:118px;height:118px;border-radius:22px;background:var(--panel);border:2px solid var(--panel-brd);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;color:var(--muted);
+  box-shadow:0 22px 44px -22px rgba(0,0,0,.5);animation:swipeDemo 3.8s ease-in-out infinite}
+.demo-card svg{width:46px;height:46px}
+@keyframes swipeDemo{
+  0%,10%{transform:translateX(0) rotate(0);border-color:var(--panel-brd);color:var(--muted)}
+  24%{transform:translateX(58px) rotate(13deg);border-color:var(--vero);color:var(--vero)}
+  34%,46%{transform:translateX(0) rotate(0);border-color:var(--panel-brd);color:var(--muted)}
+  60%{transform:translateX(-58px) rotate(-13deg);border-color:var(--falso);color:var(--falso)}
+  72%,100%{transform:translateX(0) rotate(0);border-color:var(--panel-brd);color:var(--muted)}
+}
+/* ============ MODALE DI CONFERMA ============ */
+.modal{position:fixed;inset:0;background:rgba(6,8,18,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;z-index:60}
+.modal.show{display:flex}
+.modal-box{border-radius:18px;max-width:400px;width:100%;padding:24px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.modal-box h3{margin:0 0 8px;font-size:19px}
+.modal-box p{margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.55}
+.modal-box .row{display:flex;gap:10px}
+.modal-box .row .btn{flex:1;margin:0}
+@media(prefers-reduced-motion:reduce){.demo-card{animation:none}}
+@media(max-width:640px){
+  nav{left:12px;right:12px;transform:none;max-width:none;justify-content:space-around;bottom:12px;gap:0}
+  nav button{min-width:0;flex:1;padding:7px 2px}
+  nav .lbl{font-size:10px}
+  main{padding-bottom:98px}
+}
+</style>
+<script>/* applica il tema prima del render per evitare il flash */try{if(localStorage.getItem("ppb_theme")==="light")document.documentElement.classList.add("light");}catch(e){}</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/eva-icons@1.1.3/eva.min.js"></script>
+</head>
+<body>
+<nav>
+  <button data-view="home" class="active"><span class="ico" data-eva="home-outline"></span><span class="lbl">Home</span></button>
+  <button data-view="quiz"><span class="ico" data-eva="layers-outline"></span><span class="lbl">Quiz</span></button>
+  <button data-view="chapters"><span class="ico" data-eva="book-open-outline"></span><span class="lbl">Capitoli</span></button>
+  <button data-view="progress"><span class="ico" data-eva="bar-chart-2-outline"></span><span class="lbl">Progressi</span><span class="badge" id="wrongBadge" style="display:none">0</span></button>
+  <button data-view="settings"><span class="ico" data-eva="settings-2-outline"></span><span class="lbl">Impostazioni</span></button>
+</nav>
+
+<main>
+  <!-- HOME -->
+  <section class="view active" id="home">
+    <div class="hero">
+      <span class="chip">soon i'll be a:</span>
+      <h1 class="hero-title">Drivr</h1>
+    </div>
+    <div class="swipe-demo" aria-hidden="true">
+      <span class="side left">FALSO</span>
+      <span class="side right">VERO</span>
+      <div class="demo-card"><span data-eva="navigation-2-outline"></span></div>
+    </div>
+    <div class="home-actions">
+      <button class="btn" id="startExam"><span data-eva="flash-outline"></span> Nuovo quiz</button>
+      <button class="btn ghost" id="startReview"><span data-eva="refresh-outline"></span> Ripassa gli errori</button>
+    </div>
+    <p class="arrow-note">30 domande casuali · con più di 3 errori sei bocciato.<br>Trascina la scheda o usa le frecce ← → della tastiera.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="quiz">
+    <div class="quiz-head">
+      <span class="mode-pill" id="quizMode"></span>
+      <button class="btn-mini" id="newQuizBtn"><span data-eva="flash-outline"></span> Nuovo quiz</button>
+    </div>
+    <div class="quizbar">
+      <div class="progress"><i id="qprog"></i></div>
+      <div class="counter" id="qcounter">1 / 30 · <span class="err">0 err</span></div>
+    </div>
+    <div class="deck" id="deck"></div>
+    <div class="controls">
+      <button class="no" id="btnFalso"><span class="k">←</span>FALSO</button>
+      <button class="yes" id="btnVero">VERO<span class="k">→</span></button>
+    </div>
+    <p class="arrow-note">← FALSO &nbsp;·&nbsp; VERO → &nbsp;·&nbsp; oppure trascina la scheda</p>
+  </section>
+
+  <!-- RESULT -->
+  <section class="view" id="resultView">
+    <div class="result">
+      <div class="verdict" id="verdict"></div>
+      <div class="ring" id="ring"><i id="ringTxt"></i></div>
+      <div class="rr">
+        <div class="g"><b id="rGood">0</b><span>Corrette</span></div>
+        <div class="b"><b id="rBad">0</b><span>Errate</span></div>
+      </div>
+      <div class="rowbtns">
+        <button class="btn" id="againBtn">Nuovo test</button>
+        <button class="btn ghost" id="reviewBtn">Vedi errori</button>
+        <button class="btn ghost" id="homeBtn">Home</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS: Stats + Sbagliate -->
+  <section class="view" id="progress">
+    <h2>I tuoi progressi</h2>
+    <div class="subtabs">
+      <button class="subtab active" data-sub="stats"><span data-eva="pie-chart-outline" style="vertical-align:-4px"></span> Stats</button>
+      <button class="subtab" data-sub="wrong"><span data-eva="close-circle-outline" style="vertical-align:-4px"></span> Sbagliate<span class="badge" id="wrongBadge2" style="display:none">0</span></button>
+    </div>
+    <div class="subview" id="sub-stats">
+      <p class="sub">Storico dei test (blocchi da 30) in ordine cronologico.</p>
+      <div class="stats" id="progStats"></div>
+      <div class="chartbox" id="statTrendBox" style="display:none"><h4>Corrette ed errori per test</h4><div class="chart" id="statTrend"></div></div>
+      <div class="chartbox" id="statDonutBox" style="display:none"><h4>Esiti: promosso vs bocciato</h4><div class="chart sm" id="statDonut"></div></div>
+      <div class="rowbtns" id="progBtns"></div>
+      <div class="list" id="progList"></div>
+    </div>
+    <div class="subview" id="sub-wrong" style="display:none">
+      <p class="sub">Tutte le domande su cui hai sbagliato, con risposta corretta e spiegazione.</p>
+      <div class="rowbtns" id="wrongBtns"></div>
+      <div class="list" id="wrongList"></div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section class="view" id="chapters">
+    <h2>Capitoli</h2>
+    <p class="sub">Le domande divise per argomento (secondo la classificazione ministeriale). Allenati su un capitolo alla volta.</p>
+    <div class="chartbox" id="chapChartBox" style="display:none"><h4>Domande per capitolo</h4><div class="chart" id="chapChart"></div></div>
+    <div class="list" id="chapList" style="margin-top:6px"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="settings">
+    <h2>Impostazioni</h2>
+
+    <div class="import-box setblock">
+      <h3>Aspetto</h3>
+      <label class="switch-row">
+        <span class="t">Tema chiaro<small>Attiva la versione chiara (rosa). Disattivato = tema scuro.</small></span>
+        <span class="sw"><input type="checkbox" id="toggleTheme"><span></span></span>
+      </label>
+    </div>
+
+    <div class="import-box setblock">
+      <h3>Banche dati</h3>
+      <label class="switch-row">
+        <span class="t">Domande precaricate<small>101 domande ministeriali di prova incluse nell'app</small></span>
+        <span class="sw"><input type="checkbox" id="toggleSample"><span></span></span>
+      </label>
+      <label class="switch-row">
+        <span class="t">Domande AI “Novità 2026”<small>28 domande scritte con l'AI (angoli ciechi, ADAS, monopattini, smartphone, neopatentati) — non ufficiali</small></span>
+        <span class="sw"><input type="checkbox" id="toggle26"><span></span></span>
+      </label>
+      <div class="pill" id="importState" style="margin-top:14px">In gioco: …</div>
+    </div>
+
+    <div class="import-box setblock">
+      <h3>Aggiungi domande (file JSON)</h3>
+      <p class="sub" style="text-align:left;margin:2px 0 0;font-size:13px">Le domande del file si <b>aggiungono</b> a quelle già presenti (i doppioni vengono ignorati). Formato accettato: array <code>[{"q","a","e","t","img"}]</code> oppure la struttura ministeriale a temi.</p>
+      <div class="drop" id="drop">
+        <div class="dropico"><span data-eva="cloud-upload-outline"></span></div>
+        <div>Trascina qui un file <b>.json</b> o clicca per sceglierlo</div>
+      </div>
+      <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+      <div class="disclaimer"><b>Attenzione:</b> le immagini devono essere indicate con un <b>URL completo</b> (es. <code>https://…/segnale.png</code>) nel campo <code>img</code>, altrimenti non verranno mostrate.</div>
+    </div>
+
+    <div class="import-box setblock danger">
+      <h3>Danger zone</h3>
+      <p class="sub" style="text-align:left;margin:2px 0 10px;font-size:13px">Il tuo ID locale: <code id="uid">—</code><br><span id="uidnote" style="color:var(--muted)"></span></p>
+      <p class="sub" style="text-align:left;margin:0 0 12px;font-size:13px"><b>Attenzione:</b> il ripristino è <b>definitivo</b>. Statistiche, storico dei test e domande sbagliate vengono cancellati e <b>non possono più essere recuperati</b>.</p>
+      <div class="rowbtns" style="margin:0">
+        <button class="btn danger-btn" id="resetResults">Azzera i miei risultati</button>
+        <button class="btn ghost" id="resetAll">Ripristina tutto</button>
+      </div>
+    </div>
+
+    <div class="credits" style="margin-top:8px;text-align:left">
+      <b>Crediti</b><br>
+      Domande ministeriali: archivio open source <a href="https://github.com/Ed0ardo/QuizPatenteB" target="_blank" rel="noopener">Ed0ardo/QuizPatenteB</a>.<br>
+      Icone: <a href="https://akveo.github.io/eva-icons/" target="_blank" rel="noopener">Eva Icons</a>. Grafici: <a href="https://echarts.apache.org/" target="_blank" rel="noopener">Apache ECharts</a>.<br>
+      Le domande contrassegnate come AI sono una rielaborazione del nuovo Codice della Strada e <b>non sono ufficiali</b>.<br><br>
+      Non viene raccolto nessun dato: tutto resta solo sul tuo dispositivo. È un progetto aperto e gratuito per tutti, fatto principalmente per me stesso.
+    </div>
+  </section>
+</main>
+
+<!-- EXPLANATION -->
+<div class="expl" id="expl">
+  <div class="expl-box">
+    <span class="tag">Risposta sbagliata</span>
+    <p class="qq" id="eQ"></p>
+    <div class="ans">La tua risposta: <b id="eYour"></b></div>
+    <div class="ans">Risposta corretta: <b id="eCorrect"></b></div>
+    <div class="why" id="eWhy"></div>
+    <div id="eSrc" style="margin:-6px 0 16px"></div>
+    <button id="eNext">Continua</button>
+  </div>
+</div>
+
+<!-- MODALE DI CONFERMA -->
+<div class="modal" id="confirm">
+  <div class="modal-box">
+    <h3 id="cfTitle">Confermi?</h3>
+    <p id="cfText"></p>
+    <div class="row">
+      <button class="btn ghost" id="cfNo">Annulla</button>
+      <button class="btn danger-btn" id="cfYes">Conferma</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- DATASET base (100 domande reali, solo testo) ---------- */
+const IMG_BASE="https://raw.githubusercontent.com/Ed0ardo/QuizPatenteB/master";
+const SAMPLE=[
+{t:"Strada",q:"La strada può essere suddivisa in carreggiate",a:true,e:"Esatto: la strada può comprendere una o più carreggiate, oltre a banchine, marciapiedi e piste ciclabili."},
+{t:"Strada",q:"La strada può comprendere le piste ciclabili",a:true,e:"Vero: la strada include tutte le sue parti, comprese le piste ciclabili."},
+{t:"Strada",q:"La strada è aperta alla circolazione dei pedoni, degli animali e dei veicoli",a:true,e:"Definizione corretta: la strada è l'area ad uso pubblico destinata alla circolazione di pedoni, animali e veicoli."},
+{t:"Strada",q:"La strada non comprende le banchine",a:false,e:"Falso: le banchine fanno parte della strada (anche se non della carreggiata)."},
+{t:"Strada",q:"La strada è riservata alla circolazione dei soli autoveicoli e motocicli",a:false,e:"Falso: la strada è aperta anche a pedoni, animali, biciclette e altri veicoli."},
+{t:"Strada",q:"La strada non comprende i marciapiedi",a:false,e:"Falso: i marciapiedi sono parte della strada, destinati ai pedoni."},
+{t:"Autostrada",q:"L'autostrada non ha incroci a raso che l'attraversano",a:true,e:"Vero: l'autostrada non ha intersezioni a raso; gli accessi avvengono con svincoli, corsie di accelerazione e decelerazione."},
+{t:"Autostrada",q:"L'autostrada è dotata di speciali corsie per l'ingresso e l'uscita dei veicoli",a:true,e:"Vero: sono le corsie di accelerazione (ingresso) e decelerazione (uscita)."},
+{t:"Autostrada",q:"I motocicli con cilindrata di almeno 150 cm³ possono circolare in autostrada",a:true,e:"Vero: in autostrada sono ammessi i motocicli con cilindrata di almeno 150 cm³."},
+{t:"Autostrada",q:"L'autostrada deve essere lateralmente recintata",a:true,e:"Vero: l'autostrada è recintata per impedire l'accesso di pedoni, animali e veicoli non ammessi."},
+{t:"Autostrada",q:"Nelle autostrade possono circolare solo le autovetture",a:false,e:"Falso: possono circolare anche autocarri, autobus e motocicli di almeno 150 cm³."},
+{t:"Autostrada",q:"L'autostrada può comprendere piste ciclabili",a:false,e:"Falso: le biciclette non possono circolare in autostrada, che non ha piste ciclabili."},
+{t:"Autostrada",q:"Nelle autostrade possono circolare i ciclomotori e i motocicli fino a 125 cm³",a:false,e:"Falso: servono almeno 150 cm³; i ciclomotori e i motocicli fino a 125 cm³ non sono ammessi."},
+{t:"Carreggiata",q:"La carreggiata può essere suddivisa in corsie",a:true,e:"Vero: la carreggiata può essere divisa in due o più corsie da apposite strisce."},
+{t:"Carreggiata",q:"La carreggiata non comprende i marciapiedi",a:true,e:"Vero: i marciapiedi non fanno parte della carreggiata (sono parte della strada)."},
+{t:"Carreggiata",q:"La carreggiata è la parte della strada destinata normalmente alla circolazione dei veicoli",a:true,e:"Definizione corretta: la carreggiata è la parte della strada destinata allo scorrimento dei veicoli."},
+{t:"Carreggiata",q:"La carreggiata è destinata alla sosta di emergenza",a:false,e:"Falso: la sosta di emergenza avviene sulla corsia di emergenza o sulla banchina, non sulla carreggiata."},
+{t:"Carreggiata",q:"La carreggiata comprende le piazzole di sosta",a:false,e:"Falso: le piazzole di sosta sono esterne alla carreggiata."},
+{t:"Parti carreggiata",q:"Fanno parte della carreggiata gli attraversamenti pedonali",a:true,e:"Vero: gli attraversamenti pedonali e ciclabili fanno parte della carreggiata."},
+{t:"Parti carreggiata",q:"Fanno parte della carreggiata le corsie di emergenza delle autostrade",a:false,e:"Falso: la corsia di emergenza NON fa parte della carreggiata."},
+{t:"Parti carreggiata",q:"Fanno parte della carreggiata le banchine",a:false,e:"Falso: le banchine sono al di fuori della carreggiata."},
+{t:"Parti carreggiata",q:"Fanno parte della carreggiata i marciapiedi",a:false,e:"Falso: i marciapiedi sono riservati ai pedoni e non fanno parte della carreggiata."},
+{t:"Corsia",q:"La corsia è limitata da strisce continue o discontinue",a:true,e:"Vero: la corsia è delimitata da strisce longitudinali continue o discontinue."},
+{t:"Corsia",q:"La corsia può essere riservata alla circolazione di alcune categorie di veicoli (taxi, autobus, ecc.)",a:true,e:"Vero: esistono corsie riservate, ad esempio, a bus e taxi."},
+{t:"Corsia",q:"La corsia è una parte della carreggiata che consente la circolazione di una sola fila di veicoli",a:true,e:"Definizione corretta: la corsia consente la marcia di una sola fila di veicoli."},
+{t:"Corsia",q:"La corsia può essere a doppio senso di circolazione",a:false,e:"Falso: la corsia consente una sola fila di veicoli in un unico senso; è la carreggiata che può essere a doppio senso."},
+{t:"Corsia",q:"Nei centri abitati, su una stessa corsia possono circolare affiancati due motocicli",a:false,e:"Falso: su una corsia può marciare una sola fila di veicoli, quindi non affiancati."},
+{t:"Corsia accelerazione",q:"La corsia di accelerazione facilita l'ingresso dei veicoli in autostrada o su strade extraurbane principali",a:true,e:"Vero: serve ad aumentare la velocità per immettersi in sicurezza."},
+{t:"Corsia accelerazione",q:"La corsia di accelerazione può essere utilizzata per il sorpasso",a:false,e:"Falso: serve solo per immettersi nel flusso, non per sorpassare."},
+{t:"Corsia decelerazione",q:"La corsia di decelerazione facilita l'uscita dei veicoli dall'autostrada",a:true,e:"Vero: consente di rallentare uscendo dal flusso principale."},
+{t:"Corsia decelerazione",q:"La corsia di decelerazione può essere utilizzata per la sosta dei veicoli",a:false,e:"Falso: serve solo per rallentare in uscita, non per sostare."},
+{t:"Banchina",q:"La banchina non consente, di norma, il transito ai veicoli",a:true,e:"Vero: la banchina è esterna alla carreggiata e non è destinata al transito dei veicoli."},
+{t:"Banchina",q:"La banchina è parte della strada, situata oltre la linea bianca continua di margine della carreggiata",a:true,e:"Vero: si trova oltre la striscia di margine della carreggiata."},
+{t:"Banchina",q:"La banchina è parte della carreggiata, destinata alla sosta dei veicoli",a:false,e:"Falso: la banchina è FUORI dalla carreggiata e non è destinata alla sosta ordinaria."},
+{t:"Marciapiede",q:"Il marciapiede è una parte della strada, rialzata o delimitata, riservata ai pedoni",a:true,e:"Definizione corretta: il marciapiede è riservato ai pedoni."},
+{t:"Marciapiede",q:"Il marciapiede è una parte della carreggiata",a:false,e:"Falso: il marciapiede è parte della strada ma non della carreggiata."},
+{t:"Marciapiede",q:"Il marciapiede è una parte della strada riservata anche alle biciclette",a:false,e:"Falso: il marciapiede è riservato ai pedoni, non alle biciclette."},
+{t:"Salvagente",q:"Il salvagente facilita la salita e la discesa dei passeggeri da tram, filobus o autobus",a:true,e:"Vero: il salvagente protegge i pedoni in attesa e in salita/discesa dai mezzi pubblici."},
+{t:"Salvagente",q:"Il salvagente serve a dividere i sensi di marcia in una strada a doppio senso",a:false,e:"Falso: a dividere i sensi di marcia è lo spartitraffico, non il salvagente."},
+{t:"Passo carrabile",q:"Il passo carrabile consente ai veicoli di accedere alle proprietà private laterali alla strada",a:true,e:"Vero: il passo carrabile è l'accesso a proprietà laterali (garage, cortili)."},
+{t:"Passo carrabile",q:"In corrispondenza del passo carrabile è consentita la fermata",a:true,e:"Vero: la fermata (breve, con conducente a bordo) è consentita; è vietata la sosta."},
+{t:"Passo carrabile",q:"In corrispondenza del passo carrabile è consentita la sosta",a:false,e:"Falso: davanti a un passo carrabile la sosta è vietata."},
+{t:"Ciclomotori",q:"I veicoli a due ruote con motore fino a 50 cm³ e velocità massima di 45 km/h sono ciclomotori",a:true,e:"Definizione corretta di ciclomotore: fino a 50 cm³ e non oltre 45 km/h."},
+{t:"Ciclomotori",q:"I ciclomotori sono soggetti a revisione dopo quattro anni dalla prima immatricolazione, poi ogni due anni",a:true,e:"Vero: prima revisione a 4 anni, poi ogni 2 anni."},
+{t:"Ciclomotori",q:"Si definiscono ciclomotori tutti i veicoli a due ruote di cilindrata superiore a 50 cm³",a:false,e:"Falso: oltre i 50 cm³ si tratta di motocicli, non di ciclomotori."},
+{t:"Ciclomotori",q:"I ciclomotori possono circolare alla velocità di 60 km/h fuori dai centri urbani",a:false,e:"Falso: la velocità massima dei ciclomotori è 45 km/h ovunque."},
+{t:"Tricicli",q:"I tricicli a motore sono veicoli a motore a tre ruote simmetriche",a:true,e:"Vero: hanno tre ruote disposte simmetricamente."},
+{t:"Tricicli",q:"I tricicli a motore sono veicoli a motore che possono essere condotti senza patente",a:false,e:"Falso: per guidare un triciclo a motore serve la patente."},
+{t:"Quadricicli",q:"I quadricicli leggeri, ai fini della circolazione, sono assimilati ai ciclomotori",a:true,e:"Vero: i quadricicli leggeri sono equiparati ai ciclomotori."},
+{t:"Quadricicli",q:"I quadricicli sono soggetti a revisione periodica",a:true,e:"Vero: come gli altri veicoli, sono soggetti a revisione."},
+{t:"Quadricicli",q:"I quadricicli diversi da quelli leggeri possono essere guidati senza patente",a:false,e:"Falso: per i quadricicli non leggeri serve la patente."},
+{t:"Comportamento",q:"Il conducente deve tenere un rapporto corretto e tollerante verso gli altri utenti della strada",a:true,e:"Vero: correttezza e tolleranza sono doveri del conducente."},
+{t:"Comportamento",q:"Avvicinandosi a un incrocio il conducente deve sempre usare la massima prudenza, anche se ha la precedenza",a:true,e:"Vero: la prudenza va usata sempre, anche avendo diritto di precedenza."},
+{t:"Comportamento",q:"Il conducente deve cercare di prevedere il comportamento degli altri utenti",a:true,e:"Vero: la guida sicura richiede di anticipare le mosse altrui."},
+{t:"Comportamento",q:"Il diritto di precedenza non autorizza ad attraversare l'incrocio senza usare prudenza",a:true,e:"Vero: la precedenza non esime dall'obbligo di prudenza."},
+{t:"Comportamento",q:"Il conducente di un veicolo di grandi dimensioni ha, di norma, la precedenza su quello di un veicolo più piccolo",a:false,e:"Falso: la precedenza dipende dalle regole della strada, non dalla dimensione del veicolo."},
+{t:"Comportamento",q:"Il conducente deve rispettare gli agenti del traffico solo se sono in divisa",a:false,e:"Falso: gli agenti del traffico vanno sempre rispettati, anche i loro segnali."},
+{t:"Comportamento",q:"Il conducente deve dare segni di impazienza se il veicolo davanti procede troppo lentamente",a:false,e:"Falso: bisogna essere pazienti e tolleranti, mai aggressivi."},
+{t:"Attenzione",q:"Un incidente, anche a bassa velocità, può creare gravi problemi fisici a pedoni, ciclisti e motociclisti",a:true,e:"Vero: gli utenti deboli sono vulnerabili anche a basse velocità."},
+{t:"Attenzione",q:"Prima di aprire lo sportello bisogna controllare che non sopraggiungano ciclisti o motociclisti",a:true,e:"Vero: aprire lo sportello senza guardare può causare gravi incidenti."},
+{t:"Attenzione",q:"I montanti interni degli autoveicoli riducono la possibilità di vedere un ciclista o un motociclista",a:true,e:"Vero: i montanti creano angoli ciechi che nascondono gli utenti deboli."},
+{t:"Attenzione",q:"Un incidente a bassa velocità non crea problemi di incolumità ai conducenti coinvolti",a:false,e:"Falso: anche a bassa velocità un incidente può causare danni fisici."},
+{t:"Attenzione",q:"Il conducente di un motociclo può fare lo slalom tra i veicoli fermi al semaforo",a:false,e:"Falso: lo slalom tra i veicoli è pericoloso e vietato."},
+{t:"Attenzione",q:"Il conducente del motociclo può parcheggiare sul marciapiede anche senza appositi spazi",a:false,e:"Falso: si può sostare solo negli spazi consentiti, non sul marciapiede."},
+{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti delle persone anziane",a:true,e:"Vero: gli anziani sono utenti più vulnerabili e con riflessi più lenti."},
+{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei bambini che attraversano la strada",a:true,e:"Vero: i bambini hanno comportamenti imprevedibili."},
+{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei conducenti che dimostrano una guida incerta",a:true,e:"Vero: una guida incerta segnala possibili manovre improvvise."},
+{t:"Prudenza",q:"Bisogna usare particolare prudenza verso chi ha conseguito la patente in uno Stato estero",a:false,e:"Falso: la maggiore prudenza va usata verso gli utenti deboli, non in base al Paese della patente."},
+{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei conducenti di autoveicoli elettrici",a:false,e:"Falso: l'alimentazione del veicolo non richiede prudenza particolare."},
+{t:"Anziani",q:"Le persone anziane che attraversano potrebbero fermarsi improvvisamente al centro della strada",a:true,e:"Vero: gli anziani possono avere reazioni lente o incerte."},
+{t:"Anziani",q:"Gli anziani sono più esposti perché potrebbero valutare male la velocità dei veicoli",a:true,e:"Vero: capacità visive e uditive ridotte aumentano il rischio."},
+{t:"Anziani",q:"Quando gli anziani attraversano hanno riflessi più rapidi e attraversano con più accortezza",a:false,e:"Falso: gli anziani hanno riflessi più lenti, quindi serve più prudenza."},
+{t:"Anziani",q:"Quando gli anziani attraversano bisogna lampeggiare e suonare il clacson per farli attraversare rapidamente",a:false,e:"Falso: suonare o lampeggiare li spaventa; bisogna attendere con pazienza."},
+{t:"Precedenza pedoni",q:"Il conducente deve fermarsi e dare la precedenza al pedone non vedente col bastone bianco che attraversa fuori dalle strisce",a:true,e:"Vero: al non vedente col bastone bianco va data sempre la precedenza."},
+{t:"Precedenza pedoni",q:"Va data la precedenza al pedone col bastone bianco anche se non accompagnato da cane guida",a:true,e:"Vero: la precedenza è dovuta indipendentemente dalla presenza del cane guida."},
+{t:"Precedenza pedoni",q:"Il conducente deve accelerare per sgombrare la carreggiata quando un non vedente col bastone bianco attraversa",a:false,e:"Falso: bisogna fermarsi e dargli la precedenza, mai accelerare."},
+{t:"Precedenza pedoni",q:"Bisogna dare la precedenza al non vedente col bastone bianco solo se le strisce distano oltre 100 metri",a:false,e:"Falso: la precedenza è sempre dovuta, senza condizioni di distanza."},
+{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, il pedone può diventare insicuro e tornare improvvisamente indietro",a:true,e:"Vero: bisogna prevedere movimenti improvvisi dei pedoni."},
+{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, i pedoni (specie i bambini) possono sbucare tra i veicoli parcheggiati",a:true,e:"Vero: i veicoli in sosta riducono la visibilità e i pedoni possono comparire all'improvviso."},
+{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, il conducente deve accelerare quel tanto che basta per passare davanti al pedone",a:false,e:"Falso: bisogna dare la precedenza al pedone, non tentare di precederlo."},
+{t:"Vicinanza pedoni",q:"Se il pedone si è fermato in mezzo alle strisce significa che ha rinunciato a passare",a:false,e:"Falso: potrebbe ripartire da un momento all'altro; bisogna aspettarlo."},
+{t:"Semaforo bambini",q:"Con bambini fermi al semaforo serve prudenza: potrebbero attraversare col rosso ritenendo che duri troppo",a:true,e:"Vero: i bambini possono attraversare in modo imprevedibile."},
+{t:"Semaforo bambini",q:"Con bambini al semaforo bisogna considerare che possono spingersi finendo sulla carreggiata",a:true,e:"Vero: i bambini possono spingersi tra loro e invadere la strada."},
+{t:"Semaforo bambini",q:"Dopo la luce verde il conducente deve attendere che i pedoni abbiano finito di attraversare",a:true,e:"Vero: prima di ripartire occorre lasciar completare l'attraversamento ai pedoni."},
+{t:"Semaforo bambini",q:"Con bambini al semaforo si è certi che attraversino solo col verde pedonale",a:false,e:"Falso: i bambini sono imprevedibili e potrebbero attraversare col rosso."},
+{t:"Scuolabus",q:"Vicino a una fermata di scuolabus occorre fare attenzione ai bambini nascosti dall'autobus",a:true,e:"Vero: i bambini possono attraversare nascosti dall'autobus fermo."},
+{t:"Scuolabus",q:"Vicino a una fermata di scuolabus occorre prepararsi a frenare se dei bambini attraversano improvvisamente",a:true,e:"Vero: bisogna rallentare ed essere pronti a fermarsi."},
+{t:"Scuolabus",q:"Vicino a una fermata di scuolabus non si deve rallentare per non ostacolare gli altri veicoli",a:false,e:"Falso: la sicurezza dei bambini viene prima; bisogna rallentare."},
+{t:"Scuolabus",q:"Vicino a una fermata di scuolabus si ha sempre la precedenza sui bambini che attraversano",a:false,e:"Falso: i pedoni, specie i bambini, hanno la precedenza sulle strisce."},
+{t:"Taxi",q:"Vicino a un posteggio di taxi bisogna fare attenzione ai pedoni che salgono o scendono dal taxi",a:true,e:"Vero: intorno ai taxi ci sono pedoni che salgono e scendono."},
+{t:"Taxi",q:"Un veicolo diverso dai taxi non può sostare nei posteggi riservati ai taxi",a:true,e:"Vero: i posteggi taxi sono riservati e vietati agli altri veicoli."},
+{t:"Taxi",q:"Un veicolo diverso dai taxi può sostare nei posteggi riservati ai taxi dalle 20.00 alle 8.00",a:false,e:"Falso: il divieto vale sempre, senza fasce orarie."},
+{t:"Ciclisti",q:"Per sorpassare ciclisti o pedoni sulla carreggiata è prudente mantenere un'adeguata distanza laterale",a:true,e:"Vero: serve una distanza di sicurezza laterale sufficiente."},
+{t:"Ciclisti",q:"Non è prudente sorpassare ciclisti o pedoni se non si può mantenere una distanza laterale sufficiente",a:true,e:"Vero: senza spazio laterale adeguato il sorpasso va evitato."},
+{t:"Ciclisti",q:"È vietato sorpassare ciclisti o pedoni che occupano la carreggiata",a:false,e:"Falso: il sorpasso è consentito con prudenza e adeguata distanza, non vietato in assoluto."},
+{t:"Ciclisti",q:"Di notte non si deve dare la precedenza ai pedoni che attraversano sulle strisce",a:false,e:"Falso: la precedenza ai pedoni sulle strisce va data sempre, anche di notte."},
+{t:"Gravidanza",q:"Il conducente deve consentire a una donna incinta di attraversare senza metterle fretta",a:true,e:"Vero: verso le donne incinte serve maggiore prudenza e pazienza."},
+{t:"Gravidanza",q:"Bisogna usare maggiore prudenza verso i pedoni che spingono una carrozzina per bambini",a:true,e:"Vero: chi spinge una carrozzina è più lento e va tutelato."},
+{t:"Gravidanza",q:"È vietato ostruire con la sosta gli scivoli del marciapiede per non impedire il passaggio delle carrozzine",a:true,e:"Vero: gli scivoli servono a carrozzine e persone con disabilità e non vanno ostruiti."},
+{t:"Gravidanza",q:"Una donna incinta che attraversa ha il passo più rapido e quindi attraversa velocemente",a:false,e:"Falso: di norma attraversa più lentamente; serve più prudenza e pazienza."},
+{t:"Gravidanza",q:"È consentito lasciare il veicolo in sosta sul marciapiede senza lasciare spazio a chi spinge una carrozzina",a:false,e:"Falso: bisogna sempre lasciare lo spazio ai pedoni; ostruire il marciapiede è vietato."}
+];
+
+/* ---------- Pacchetto "Novità 2026" — domande scritte da me (AI), NON ufficiali ----------
+   Basate sul Nuovo Codice della Strada (in vigore dal 14/12/2024) e sui nuovi temi d'esame
+   2026 (angoli ciechi, ADAS, monopattini, distrazione da smartphone, neopatentati).
+   Servono per ripassare i concetti; non sono estratti dell'archivio ministeriale. */
+const NOVITA2026=[
+{src:"ai",t:"Angoli ciechi",q:"I veicoli pesanti come i camion hanno ampie zone d'ombra (angoli ciechi) in cui il conducente non vede ciclisti e pedoni",a:true,e:"Vero: attorno a un mezzo pesante ci sono grandi angoli ciechi, soprattutto sul lato destro e dietro."},
+{src:"ai",t:"Angoli ciechi",q:"È prudente fermarsi accanto alla fiancata destra di un camion fermo al semaforo, in prossimità di un incrocio",a:false,e:"Falso: è pericoloso, perché in svolta a destra il camionista potrebbe non vederti (sei nel suo angolo cieco)."},
+{src:"ai",t:"Angoli ciechi",q:"Anche un'automobile ha angoli ciechi che i soli specchietti non coprono del tutto",a:true,e:"Vero: prima di cambiare corsia occorre girare rapidamente la testa (colpo d'occhio) per controllare l'angolo cieco."},
+{src:"ai",t:"Angoli ciechi",q:"Per superare in sicurezza un ciclista basta guardare solo lo specchietto retrovisore interno",a:false,e:"Falso: serve anche lo specchietto laterale e il controllo diretto dell'angolo cieco."},
+{src:"ai",t:"ADAS",q:"I sistemi ADAS (assistenza alla guida) aiutano il conducente ma non lo sostituiscono: la responsabilità resta sua",a:true,e:"Vero: gli ADAS sono un supporto; il conducente deve restare sempre attento e in controllo del veicolo."},
+{src:"ai",t:"ADAS",q:"La frenata automatica d'emergenza (AEB) può intervenire per ridurre o evitare un tamponamento",a:true,e:"Vero: l'AEB rileva ostacoli e può frenare autonomamente, ma non solleva il conducente dall'attenzione."},
+{src:"ai",t:"ADAS",q:"Con il cruise control adattivo attivo il conducente può smettere di sorvegliare la strada",a:false,e:"Falso: anche con l'ACC il conducente deve continuare a sorvegliare la strada ed essere pronto a intervenire."},
+{src:"ai",t:"ADAS",q:"Il sistema di mantenimento di corsia (lane keeping) sposta il volante al posto del conducente in ogni situazione",a:false,e:"Falso: assiste a mantenere la corsia, ma il conducente deve tenere le mani sul volante e il controllo del veicolo."},
+{src:"ai",t:"Monopattini",q:"Dal nuovo Codice della Strada il casco è obbligatorio per tutti i conducenti di monopattino elettrico",a:true,e:"Vero: la riforma del CdS ha esteso l'obbligo di casco a tutti gli utenti dei monopattini elettrici."},
+{src:"ai",t:"Monopattini",q:"Il monopattino elettrico può circolare liberamente sui marciapiedi in mezzo ai pedoni",a:false,e:"Falso: è vietato circolare sui marciapiedi; il monopattino va su strade urbane idonee e piste ciclabili."},
+{src:"ai",t:"Monopattini",q:"Il nuovo Codice della Strada richiede per i monopattini elettrici assicurazione RC e contrassegno identificativo",a:true,e:"Vero: la riforma ha introdotto obbligo di assicurazione e di targhino/contrassegno identificativo."},
+{src:"ai",t:"Monopattini",q:"La velocità massima consentita ai monopattini elettrici in strada è di 90 km/h",a:false,e:"Falso: il limite è 20 km/h su strada e 6 km/h nelle aree pedonali."},
+{src:"ai",t:"Monopattini",q:"I monopattini elettrici non possono essere condotti dai minori di 14 anni",a:true,e:"Vero: la guida è vietata sotto i 14 anni."},
+{src:"ai",t:"Smartphone",q:"È vietato tenere in mano il telefono cellulare mentre si guida",a:true,e:"Vero: usare il telefono tenendolo in mano durante la guida è vietato e severamente sanzionato."},
+{src:"ai",t:"Smartphone",q:"È consentito digitare un messaggio al telefono se si è fermi al semaforo con il motore acceso",a:false,e:"Falso: il divieto vale anche da fermi nel traffico o al semaforo; il conducente deve restare concentrato."},
+{src:"ai",t:"Smartphone",q:"Il sistema viva voce o gli auricolari (che lasciano libere le mani) sono consentiti alla guida",a:true,e:"Vero: è ammesso l'uso del vivavoce/auricolare purché il conducente mantenga le mani libere e la concentrazione."},
+{src:"ai",t:"Smartphone",q:"Con il nuovo Codice della Strada l'uso del cellulare alla guida può comportare anche la sospensione della patente",a:true,e:"Vero: la riforma ha inasprito le sanzioni, prevedendo anche la sospensione della patente."},
+{src:"ai",t:"Smartphone",q:"Guardare lo schermo del navigatore tenuto in mano mentre si guida non è considerato distrazione pericolosa",a:false,e:"Falso: distoglie lo sguardo dalla strada ed è pericoloso; il navigatore va fissato a un supporto."},
+{src:"ai",t:"Neopatentati",q:"Con il nuovo Codice della Strada le limitazioni per i neopatentati durano 3 anni dal conseguimento della patente B",a:true,e:"Vero: la riforma ha esteso a 3 anni il periodo delle limitazioni per i neopatentati (in precedenza 1 anno per alcune)."},
+{src:"ai",t:"Neopatentati",q:"Nei primi anni il neopatentato non può guidare auto troppo potenti in rapporto al peso",a:true,e:"Vero: valgono limiti di potenza (kW/t e kW massimi) sulle auto guidabili dai neopatentati."},
+{src:"ai",t:"Neopatentati",q:"Per i neopatentati il tasso alcolemico consentito alla guida è pari a zero (0,0 g/l)",a:true,e:"Vero: per i neopatentati (e per i conducenti under 21 e professionali) vige il tasso alcolemico zero."},
+{src:"ai",t:"Neopatentati",q:"Un neopatentato può bere un bicchiere di vino prima di guidare, purché resti sotto 0,5 g/l",a:false,e:"Falso: per i neopatentati il limite è 0,0 g/l: non è consentita alcuna assunzione di alcol."},
+{src:"ai",t:"Neopatentati",q:"I limiti di velocità ridotti per i neopatentati sono 100 km/h in autostrada e 90 km/h su extraurbane principali",a:true,e:"Vero: nei primi anni valgono limiti ridotti rispetto agli altri conducenti."},
+{src:"ai",t:"Apertura portiere",q:"Prima di aprire la portiera dopo la sosta, il conducente deve controllare che non sopraggiungano ciclisti o motociclisti",a:true,e:"Vero: l'apertura improvvisa della portiera (dooring) è una causa frequente di incidenti con i ciclisti."},
+{src:"ai",t:"Apertura portiere",q:"Per un'apertura più sicura della portiera è utile la tecnica della 'mano lontana' (aprire con la mano opposta, girando il busto)",a:true,e:"Vero: usare la mano lontana obbliga a girare il busto e a guardare indietro, individuando chi sopraggiunge."},
+{src:"ai",t:"Apertura portiere",q:"I passeggeri, a differenza del conducente, possono aprire la portiera senza controllare la strada",a:false,e:"Falso: anche i passeggeri devono controllare prima di aprire, per non colpire ciclisti o pedoni."},
+{src:"ai",t:"Utenti vulnerabili",q:"Ciclisti, pedoni e utenti dei monopattini sono considerati utenti vulnerabili e richiedono maggiore prudenza",a:true,e:"Vero: gli utenti vulnerabili sono più esposti in caso di urto e vanno protetti con distanza e attenzione."},
+{src:"ai",t:"Distanza laterale",q:"Nel sorpassare un ciclista è buona norma mantenere un'ampia distanza laterale di sicurezza",a:true,e:"Vero: una distanza laterale adeguata (in genere almeno 1,5 m) protegge il ciclista da sbandamenti e turbolenze d'aria."}
+];
+
+/* ---------- STATE / STORAGE ---------- */
+const LS={hist:"ppb_history",wrong:"ppb_wrong",data:"ppb_data",n26:"ppb_novita2026",sample:"ppb_sample",uid:"ppb_uid",theme:"ppb_theme"};
+/* Sorgenti dell'archivio ministeriale completo (provate in ordine).
+   Metti un file "domande.json" nella cartella per usare la tua copia offline;
+   altrimenti l'app scarica l'archivio completo da GitHub al primo avvio. */
+const DATASET_URLS=["domande.json","https://raw.githubusercontent.com/Ed0ardo/QuizPatenteB/master/quizPatenteB2023.json"];
+const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+
+let imported = load(LS.data,[]);               // archivio importato/auto-scaricato (accumula)
+let includeSample = load(LS.sample,true);      // domande precaricate (SAMPLE)
+let include2026 = load(LS.n26,true);           // pacchetto Novità 2026 (AI)
+let ALL = buildPool();
+let history = load(LS.hist,[]);
+let wrongBank = load(LS.wrong,[]);   // {q,a,e,t,img,src}
+const BLOCK=30, MAX_ERR=3;
+
+function buildPool(){
+  let pool=[];
+  if(includeSample) pool=pool.concat(SAMPLE);
+  pool=pool.concat(imported);
+  if(include2026) pool=pool.concat(NOVITA2026);
+  const seen=new Set(), out=[];
+  for(const q of pool){const k=(q.q||"").trim().toLowerCase();if(!k||seen.has(k))continue;seen.add(k);out.push({...q,src:q.src||"min"});}
+  return out;
+}
+function poolCounts(){
+  return {sample:includeSample?SAMPLE.length:0, imported:imported.length, ai:include2026?NOVITA2026.length:0, total:ALL.length};
+}
+function rebuild(){ALL=buildPool();updateBadges();updateSettingsState();}
+function srcLabelHTML(q){
+  return q.src==="ai"
+    ? '<div class="srclab ai"><span data-eva="flash-outline" style="vertical-align:-3px"></span> Scritta da me (AI) · basata sul nuovo Codice della Strada — non ufficiale</div>'
+    : '<div class="srclab min"><span data-eva="checkmark-circle-2-outline" style="vertical-align:-3px"></span> Domanda ministeriale · archivio ufficiale</div>';
+}
+function evaReplace(){try{if(window.eva)eva.replace({fill:"currentColor"});}catch(e){}}
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function keyOf(q){return q.q;}
+function imgUrl(q){return q.img?(q.img.startsWith("http")?q.img:IMG_BASE+q.img):null;}
+
+/* ---------- NAV ---------- */
+function show(v){
+  $$(".view").forEach(x=>x.classList.remove("active"));
+  $("#"+(v==="result"?"resultView":v)).classList.add("active");
+  $$("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  if(v==="progress"){renderProgress();renderWrong();renderStatsCharts();}
+  if(v==="chapters")renderChapters();
+  if(v==="settings")updateSettingsState();
+  if(v==="home"){renderHome();renderHomeChart();}
+  evaReplace();
+  window.scrollTo(0,0);
+}
+$$("nav button").forEach(b=>b.onclick=()=>show(b.dataset.view));
+function setSub(name){
+  $$(".subtab").forEach(b=>b.classList.toggle("active",b.dataset.sub===name));
+  $("#sub-stats").style.display = name==="stats"?"flex":"none";
+  $("#sub-wrong").style.display = name==="wrong"?"flex":"none";
+}
+$$(".subtab").forEach(b=>b.onclick=()=>setSub(b.dataset.sub));
+
+/* ---------- HOME ---------- */
+function renderHome(){ updateBadges(); }
+function updateBadges(){
+  [["#wrongBadge","inline-block"],["#wrongBadge2","inline-block"]].forEach(([sel,disp])=>{
+    const b=$(sel);if(!b)return;
+    if(wrongBank.length){b.style.display=disp;b.textContent=wrongBank.length;}else b.style.display="none";
+  });
+  const qc=$("#qcount");if(qc)qc.textContent="· "+ALL.length+" domande";
+}
+
+/* ---------- QUIZ ENGINE ---------- */
+let queue=[],idx=0,good=0,bad=0,mode="exam",sessionWrong=[],currentChapter="";
+function setQuizMode(){
+  const el=$("#quizMode");if(!el)return;
+  let cls,icon,txt;
+  if(mode==="review"){cls="review";icon="refresh-outline";txt="Ripasso errori";}
+  else if(mode==="chapter"){cls="chapter";icon="book-open-outline";txt="Capitolo · "+currentChapter;}
+  else{cls="exam";icon="layers-outline";txt="Quiz d'esame";}
+  el.className="mode-pill "+cls;
+  el.innerHTML='<span data-eva="'+icon+'"></span> '+txt;
+  evaReplace();
+}
+
+function startExam(){
+  if(ALL.length<1){toast("Nessuna domanda caricata");return;}
+  queue=shuffle(ALL).slice(0,Math.min(BLOCK,ALL.length));
+  beginSession("exam");
+}
+function startReview(){
+  if(!wrongBank.length){toast("Nessuna domanda sbagliata da ripassare 🎉");return;}
+  queue=shuffle(wrongBank).slice(0,Math.min(BLOCK,wrongBank.length));
+  beginSession("review");
+}
+function beginSession(m){
+  mode=m;idx=0;good=0;bad=0;sessionWrong=[];
+  show("quiz");setQuizMode();renderCard();updateBar();
+}
+function updateBar(){
+  $("#qprog").style.width=(idx/queue.length*100)+"%";
+  $("#qcounter").innerHTML=`${Math.min(idx+1,queue.length)} / ${queue.length} · <span class="err">${bad} err</span>`;
+}
+function renderCard(){
+  const deck=$("#deck");deck.innerHTML="";
+  if(idx>=queue.length){finish();return;}
+  // render current + next (peek) for depth
+  const q=queue[idx];
+  const card=document.createElement("div");
+  card.className="card";
+  const url=imgUrl(q);
+  card.innerHTML=
+    `<div class="topic">${q.t||"Quiz"}</div>
+     ${url?`<div class="qimg"><img src="${url}" alt="" onerror="this.parentNode.style.display='none'"></div>`:""}
+     <div class="q">${q.q}</div>
+     <div class="hint"><span>← Falso</span><span>Vero →</span></div>
+     <div class="stamp v">VERO</div><div class="stamp f">FALSO</div>`;
+  deck.appendChild(card);
+  attachDrag(card);
+  updateBar();
+}
+function answer(val){ // val=true(vero)/false(falso)
+  const q=queue[idx];
+  const correct=(val===q.a);
+  if(correct){good++;}
+  else{
+    bad++;
+    sessionWrong.push(q);
+    addWrong(q);
+  }
+  const card=$(".card");
+  if(card){
+    card.style.transition="transform .35s ease, opacity .35s ease";
+    card.style.transform=`translateX(${val?600:-600}px) rotate(${val?18:-18}deg)`;
+    card.style.opacity="0";
+  }
+  setTimeout(()=>{
+    idx++;
+    if(!correct){ showExpl(q,val); }
+    else { renderCard(); }
+  },300);
+}
+function addWrong(q){
+  if(!wrongBank.some(w=>keyOf(w)===keyOf(q))){
+    wrongBank.push({q:q.q,a:q.a,e:q.e||"",t:q.t||"",img:q.img||null,src:q.src||"min"});
+    save(LS.wrong,wrongBank);
+    updateBadges();
+  }
+}
+
+/* ---------- EXPLANATION ---------- */
+function showExpl(q,your){
+  $("#eQ").textContent=q.q;
+  $("#eYour").innerHTML=your?'<span style="color:var(--vero)">VERO</span>':'<span style="color:var(--falso)">FALSO</span>';
+  $("#eCorrect").innerHTML=q.a?'<b class="v">VERO</b>':'<b class="f">FALSO</b>';
+  $("#eWhy").textContent=q.e||("La risposta corretta è "+(q.a?"VERO":"FALSO")+".");
+  $("#eSrc").innerHTML=srcLabelHTML(q);
+  $("#expl").classList.add("show");
+  evaReplace();
+}
+$("#eNext").onclick=()=>{$("#expl").classList.remove("show");renderCard();};
+
+/* ---------- FINISH ---------- */
+function finish(){
+  const total=queue.length;
+  const rec={date:Date.now(),good,err:bad,total,mode};
+  if(mode==="exam"){history.push(rec);save(LS.hist,history);}
+  const pass=bad<=MAX_ERR;
+  $("#verdict").textContent=pass?"PROMOSSO ✓":"BOCCIATO ✗";
+  $("#verdict").className="verdict "+(pass?"pass":"fail");
+  const pct=Math.round(good/total*100);
+  const ring=$("#ring");ring.style.setProperty("--pct",pct+"%");
+  ring.style.background=`conic-gradient(${pass?'var(--vero)':'var(--falso)'} ${pct}%,var(--bg2) 0)`;
+  $("#ringTxt").textContent=pct+"%";
+  $("#rGood").textContent=good;$("#rBad").textContent=bad;
+  $("#reviewBtn").style.display=bad?"inline-block":"none";
+  show("result");
+}
+$("#againBtn").onclick=startExam;
+$("#reviewBtn").onclick=()=>{show("progress");setSub("wrong");};
+$("#homeBtn").onclick=()=>show("home");
+
+/* ---------- DRAG / SWIPE ---------- */
+function attachDrag(card){
+  let sx=0,sy=0,dx=0,down=false;
+  const onDown=e=>{down=true;card.classList.add("dragging");const p=pt(e);sx=p.x;sy=p.y;};
+  const onMove=e=>{
+    if(!down)return;const p=pt(e);dx=p.x-sx;const dy=p.y-sy;
+    card.style.transform=`translate(${dx}px,${dy*0.15}px) rotate(${dx*0.05}deg)`;
+    const v=$(".stamp.v"),f=$(".stamp.f");
+    if(v)v.style.opacity=Math.max(0,Math.min(1,dx/120));
+    if(f)f.style.opacity=Math.max(0,Math.min(1,-dx/120));
+    if(Math.abs(dx)>5&&e.cancelable)e.preventDefault();
+  };
+  const onUp=()=>{
+    if(!down)return;down=false;card.classList.remove("dragging");
+    if(dx>110){answer(true);}
+    else if(dx<-110){answer(false);}
+    else{card.style.transform="";const v=$(".stamp.v"),f=$(".stamp.f");if(v)v.style.opacity=0;if(f)f.style.opacity=0;}
+    dx=0;
+  };
+  card.addEventListener("pointerdown",onDown);
+  window.addEventListener("pointermove",onMove,{passive:false});
+  window.addEventListener("pointerup",onUp);
+  card._cleanup=()=>{window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);};
+}
+function pt(e){return{x:e.clientX,y:e.clientY};}
+
+/* buttons + keyboard */
+$("#btnVero").onclick=()=>{if($("#quiz").classList.contains("active"))answer(true);};
+$("#btnFalso").onclick=()=>{if($("#quiz").classList.contains("active"))answer(false);};
+document.addEventListener("keydown",e=>{
+  if($("#expl").classList.contains("show")){if(e.key==="Enter"||e.key===" ")$("#eNext").click();return;}
+  if(!$("#quiz").classList.contains("active"))return;
+  if(e.key==="ArrowRight")answer(true);
+  if(e.key==="ArrowLeft")answer(false);
+});
+
+/* ---------- WRONG LIST ---------- */
+function renderWrong(){
+  const box=$("#wrongList"),btns=$("#wrongBtns");
+  if(!wrongBank.length){
+    box.innerHTML=`<div class="empty"><div class="em"><span data-eva="checkmark-circle-2-outline"></span></div>Nessuna domanda sbagliata. Ottimo lavoro!</div>`;
+    btns.innerHTML="";evaReplace();return;
+  }
+  btns.innerHTML=`<button class="btn" id="revNow">Ripassa queste (${Math.min(wrongBank.length,BLOCK)})</button>
+                  <button class="btn ghost" id="clearWrong">Svuota elenco</button>`;
+  $("#revNow").onclick=startReview;
+  $("#clearWrong").onclick=()=>{if(confirm("Svuotare l'elenco delle domande sbagliate?")){wrongBank=[];save(LS.wrong,wrongBank);updateBadges();renderWrong();}};
+  box.innerHTML=wrongBank.map(q=>{
+    const url=imgUrl(q);
+    return `<div class="qrow">
+      <div class="top">
+        <div class="qt">${q.q}</div>
+        <div class="corr ${q.a?'v':'f'}">${q.a?'VERO':'FALSO'}</div>
+      </div>
+      ${url?`<div class="qimg" style="text-align:left;margin-top:8px"><img src="${url}" style="max-height:90px;background:#fff;border-radius:6px;padding:4px" onerror="this.style.display='none'"></div>`:""}
+      <div class="ex">${q.e||("La risposta corretta è "+(q.a?"VERO":"FALSO")+".")}</div>
+      ${srcLabelHTML(q)}
+      ${q.t?`<div class="meta">${q.t}</div>`:""}
+    </div>`;
+  }).join("");
+  evaReplace();
+}
+
+/* ---------- PROGRESS ---------- */
+function renderProgress(){
+  const box=$("#progList"),st=$("#progStats"),btns=$("#progBtns");
+  const tests=history.length;
+  const passed=history.filter(h=>h.err<=MAX_ERR).length;
+  const totalAns=history.reduce((s,h)=>s+h.total,0);
+  const totalGood=history.reduce((s,h)=>s+h.good,0);
+  const acc=totalAns?Math.round(totalGood/totalAns*100):0;
+  st.innerHTML=`<div class="stat"><b>${tests}</b><span>Test svolti</span></div>
+    <div class="stat"><b>${passed}</b><span>Promosso</span></div>
+    <div class="stat"><b>${acc}%</b><span>Precisione</span></div>
+    <div class="stat"><b>${wrongBank.length}</b><span>Da ripassare</span></div>`;
+  if(!tests){
+    box.innerHTML=`<div class="empty"><div class="em"><span data-eva="trending-up-outline"></span></div>Nessun test ancora svolto.<br>Fai il tuo primo blocco da 30!</div>`;
+    btns.innerHTML="";evaReplace();return;
+  }
+  btns.innerHTML=`<button class="btn ghost" id="clearHist">Cancella storico</button>`;
+  $("#clearHist").onclick=()=>{if(confirm("Cancellare tutto lo storico dei test?")){history=[];save(LS.hist,history);renderProgress();}};
+  box.innerHTML=history.slice().reverse().map((h,i)=>{
+    const n=history.length-i;
+    const pass=h.err<=MAX_ERR;
+    const d=new Date(h.date);
+    const ds=d.toLocaleDateString("it-IT",{day:"2-digit",month:"short",year:"numeric"})+" · "+d.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+    return `<div class="hrow">
+      <div class="badge2 ${pass?'pass':'fail'}">${pass?'OK':'KO'}</div>
+      <div class="hinfo"><b>Test #${n}</b><span>${ds}</span></div>
+      <div class="hscore"><b style="color:${pass?'var(--vero)':'var(--falso)'};font-size:16px">${h.good}/${h.total}</b><br>${h.err} errori</div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- IMPORT ---------- */
+function flatten(obj){
+  // struttura: { macro-argomento: { sotto-tema: [ {img,q,a} ] } }
+  const out=[];
+  function walk(node,path){
+    if(Array.isArray(node)){
+      const macro=path[0]||"", sub=path[path.length-1]||"";
+      node.forEach(it=>{if(it&&typeof it.q==="string"&&typeof it.a==="boolean")
+        out.push({q:it.q,a:it.a,img:it.img||null,e:"",t:prettify(sub),c:prettify(macro),src:"min"});});
+    }else if(node&&typeof node==="object"){
+      for(const k in node)walk(node[k],path.concat(k));
+    }
+  }
+  walk(obj,[]);
+  return out;
+}
+function prettify(k){if(!k)return"Quiz";return k.replace(/-/g," ").replace(/\b\w/g,c=>c.toUpperCase());}
+function setImported(list){        // sostituisce l'archivio (usato dall'auto-download)
+  imported=list;save(LS.data,imported);rebuild();renderHome();
+}
+function addImported(list){        // aggiunge al set esistente (import manuale)
+  if(!list.length){toast("Nessuna domanda valida nel file");return;}
+  const before=ALL.length;
+  imported=imported.concat(list);save(LS.data,imported);rebuild();renderHome();
+  const added=ALL.length-before;
+  toast(added>0?("Aggiunte "+added+" domande ("+(list.length-added)+" doppioni ignorati)"):"Nessuna nuova domanda (erano già presenti)");
+}
+function updateSettingsState(){
+  const el=$("#importState");if(!el)return;
+  const c=poolCounts();
+  el.innerHTML=`In gioco: <b>${c.total}</b> domande &nbsp;·&nbsp; precaricate ${c.sample} · importate ${c.imported} · AI ${c.ai}`;
+  const ts=$("#toggleSample"),tg2=$("#toggle26");if(ts)ts.checked=includeSample;if(tg2)tg2.checked=include2026;
+}
+function normalize(j){
+  return Array.isArray(j)
+    ? j.filter(x=>x&&typeof x.q==="string"&&typeof x.a==="boolean")
+        .map(x=>({q:x.q,a:x.a,img:x.img||null,e:x.e||"",t:x.t||prettify(x.topic||""),c:x.c||prettify(x.chapter||""),src:x.src==="ai"?"ai":"min"}))
+    : flatten(j);
+}
+/* ---------- CAPITOLI + GRAFICI ---------- */
+/* Raggruppa i tanti sotto-temi ministeriali in max 20 argomenti canonici */
+const CHAPTER_MAP=[
+  {name:"Definizioni e doveri del conducente",kw:["definiz","dover","convivenz","utenti-debol","uso-responsabile"]},
+  {name:"Comportamento e prudenza",kw:["comportament","prudenz","anzian","bambini","gravidanz","attenzion","taxi","scuolabus","pedon","ciclist","persone"]},
+  {name:"Elementi della strada",kw:["carreggiat","corsia","banchina","marciapiede","autostrada","strada","salvagente","carrabile","isola","intersezion","zona-traffico","passaggio-livello","aree-pedonali","piazzol","centro-abitato"]},
+  {name:"Tipi di veicoli",kw:["ciclomotor","motocicl","quadricicl","tricicl","macchine-agricol","caravan","autocaravan","autoveicol","autovettur","rimorch","monopattin"]},
+  {name:"Segnali di pericolo",kw:["pericolo"]},
+  {name:"Segnali di divieto",kw:["divieto"]},
+  {name:"Segnali di obbligo",kw:["obbligo"]},
+  {name:"Segnali di precedenza",kw:["precedenz"]},
+  {name:"Segnaletica orizzontale",kw:["orizzontal","strisc"]},
+  {name:"Semafori e agenti del traffico",kw:["semafor","agenti","luminos"]},
+  {name:"Segnali di indicazione e pannelli",kw:["indicazion","pannell"]},
+  {name:"Velocità e distanze",kw:["velocit","distanz","limiti"]},
+  {name:"Sorpasso, svolta e sosta",kw:["sorpass","svolta","cambio-direzion","cambio-corsia","fermata","sosta","arresto","circolazion","posizione-veicol","ingombro"]},
+  {name:"Il veicolo: dotazioni e manutenzione",kw:["luci","spie","equipaggiam","pneumatic","catene","cintur","casco","ritenut","motore","manutenz","stabilit","freni","element"]},
+  {name:"Incidenti e primo soccorso",kw:["incident","soccorso","emergenz"]},
+  {name:"Documenti, patenti e sanzioni",kw:["patent","document","sanzion","classificazione","targa"]},
+  {name:"Guida sicura e ambiente",kw:["alcol","droga","stupefac","farmac","ambient","inquinam","risparmio","stanchezz","affaticam"]},
+  {name:"Assicurazione e responsabilità",kw:["assicuraz","responsabilit"]}
+];
+function chapterOf(q){
+  if(q.src==="ai") return "Novità 2026 (AI)";
+  const s=((q.c||"")+" "+(q.t||"")).toLowerCase();
+  for(const c of CHAPTER_MAP){ if(c.kw.some(k=>s.includes(k))) return c.name; }
+  return "Altri argomenti";
+}
+function chapterStats(){
+  const map=new Map();
+  ALL.forEach(q=>{const c=chapterOf(q);if(!map.has(c))map.set(c,{name:c,total:0,wrong:0});map.get(c).total++;});
+  const ws=new Set(wrongBank.map(w=>w.q));
+  ALL.forEach(q=>{if(ws.has(q.q)){const c=chapterOf(q);map.get(c).wrong++;}});
+  return [...map.values()].sort((a,b)=>b.total-a.total);
+}
+let charts={};
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function cTheme(){return {txt:cssVar("--txt"),muted:cssVar("--muted"),line:cssVar("--line"),vero:cssVar("--vero"),falso:cssVar("--falso"),accent:cssVar("--accent"),accent2:cssVar("--accent2")};}
+function getChart(id){if(!window.echarts)return null;if(charts[id])return charts[id];const el=$("#"+id);if(!el)return null;charts[id]=echarts.init(el,null,{renderer:"svg"});return charts[id];}
+function renderHomeChart(){
+  const box=$("#homeChartBox");if(!box)return;if(history.length<2){box.style.display="none";return;}
+  box.style.display="block";const c=cTheme();const ch=getChart("homeChart");if(!ch)return;
+  const last=history.slice(-12),base=history.length-last.length;
+  ch.setOption({grid:{left:34,right:14,top:16,bottom:24},tooltip:{trigger:"axis"},
+    xAxis:{type:"category",data:last.map((h,i)=>"#"+(base+i+1)),axisLine:{lineStyle:{color:c.line}},axisLabel:{color:c.muted}},
+    yAxis:{type:"value",min:0,max:30,splitLine:{lineStyle:{color:c.line}},axisLabel:{color:c.muted}},
+    series:[{type:"line",smooth:true,symbolSize:7,data:last.map(h=>h.good),lineStyle:{width:3,color:c.accent},itemStyle:{color:c.accent},
+      areaStyle:{opacity:.22,color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:c.accent2},{offset:1,color:"rgba(0,0,0,0)"}])},
+      markLine:{silent:true,symbol:"none",data:[{yAxis:27}],lineStyle:{color:c.falso,type:"dashed"},label:{formatter:"soglia 27",color:c.muted}}}]});
+  ch.resize();
+}
+function renderStatsCharts(){
+  const tBox=$("#statTrendBox"),dBox=$("#statDonutBox"),c=cTheme();
+  if(!history.length){tBox.style.display="none";dBox.style.display="none";return;}
+  tBox.style.display="block";dBox.style.display="block";
+  const last=history.slice(-15),base=history.length-last.length;
+  const t=getChart("statTrend");
+  if(t){t.setOption({grid:{left:34,right:14,top:34,bottom:24},tooltip:{trigger:"axis"},legend:{data:["Corrette","Errori"],top:0,textStyle:{color:c.muted}},
+    xAxis:{type:"category",data:last.map((h,i)=>"#"+(base+i+1)),axisLabel:{color:c.muted},axisLine:{lineStyle:{color:c.line}}},
+    yAxis:{type:"value",splitLine:{lineStyle:{color:c.line}},axisLabel:{color:c.muted}},
+    series:[{name:"Corrette",type:"bar",stack:"s",data:last.map(h=>h.good),itemStyle:{color:c.vero}},
+            {name:"Errori",type:"bar",stack:"s",data:last.map(h=>h.err),itemStyle:{color:c.falso,borderRadius:[3,3,0,0]}}]});t.resize();}
+  const passed=history.filter(h=>h.err<=MAX_ERR).length,failed=history.length-passed;
+  const d=getChart("statDonut");
+  if(d){d.setOption({tooltip:{trigger:"item"},legend:{bottom:0,textStyle:{color:c.muted}},
+    series:[{type:"pie",radius:["45%","70%"],center:["50%","44%"],label:{color:c.txt},labelLine:{lineStyle:{color:c.line}},
+      data:[{value:passed,name:"Promosso",itemStyle:{color:c.vero}},{value:failed,name:"Bocciato",itemStyle:{color:c.falso}}]}]});d.resize();}
+}
+function renderChapters(){
+  const list=$("#chapList"),box=$("#chapChartBox"),c=cTheme();const st=chapterStats();
+  if(!st.length){list.innerHTML=`<div class="empty"><div class="em"><span data-eva="book-open-outline"></span></div>Nessuna domanda.</div>`;box.style.display="none";evaReplace();return;}
+  box.style.display="block";
+  const top=st.slice(0,12).slice().reverse();const ch=getChart("chapChart");
+  if(ch){ch.getDom().style.height=Math.max(200,top.length*26+40)+"px";
+    ch.setOption({grid:{left:6,right:18,top:6,bottom:6,containLabel:true},tooltip:{trigger:"axis",axisPointer:{type:"shadow"}},
+    xAxis:{type:"value",splitLine:{lineStyle:{color:c.line}},axisLabel:{color:c.muted}},
+    yAxis:{type:"category",data:top.map(s=>s.name),axisLabel:{color:c.muted,width:140,overflow:"truncate"},axisLine:{lineStyle:{color:c.line}}},
+    series:[{type:"bar",data:top.map(s=>s.total),barMaxWidth:16,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:c.accent},{offset:1,color:c.accent2}]),borderRadius:[0,4,4,0]}}]});ch.resize();}
+  list.innerHTML=st.map(s=>{const pct=s.total?Math.round((s.total-s.wrong)/s.total*100):0;
+    return `<div class="chaprow"><div class="ci"><div class="cn">${s.name}</div>
+      <div class="cm">${s.total} domande${s.wrong?` · ${s.wrong} da ripassare`:""}</div>
+      <div class="cbar"><i style="width:${pct}%"></i></div></div>
+      <button data-chap="${encodeURIComponent(s.name)}">Allenati</button></div>`;}).join("");
+  list.querySelectorAll("button[data-chap]").forEach(b=>b.onclick=()=>startChapter(decodeURIComponent(b.dataset.chap)));
+  evaReplace();
+}
+function startChapter(name){
+  const pool=ALL.filter(q=>chapterOf(q)===name);
+  if(!pool.length){toast("Capitolo vuoto");return;}
+  currentChapter=name;
+  queue=shuffle(pool).slice(0,Math.min(BLOCK,pool.length));beginSession("chapter");
+}
+async function autoLoadFull(force){
+  // se hai già un archivio scaricato/importato e non forzi, usa quello (offline, istantaneo)
+  if(!force && imported.length) return false;
+  const pill=$("#importState"); if(pill)pill.textContent="Scarico l'archivio completo…";
+  for(const url of DATASET_URLS){
+    try{
+      const res=await fetch(url,{cache:"no-store"});
+      if(!res.ok) continue;
+      const list=normalize(await res.json());
+      if(list.length>200){ setImported(list); toast("Archivio completo: "+list.length+" domande"); return true; }
+    }catch(e){/* provo la prossima sorgente */}
+  }
+  updateSettingsState(); // fetch fallito (es. aperto da file:// in locale): resto sul set precaricato
+  return false;
+}
+function handleFile(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{ addImported(normalize(JSON.parse(r.result))); }
+    catch(e){toast("File non valido: "+e.message);}
+  };
+  r.readAsText(file);
+}
+const drop=$("#drop"),fi=$("#fileInput");
+drop.onclick=()=>fi.click();
+fi.onchange=e=>{if(e.target.files[0])handleFile(e.target.files[0]);};
+["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+
+/* toggle banche dati */
+$("#toggleSample").onchange=e=>{includeSample=e.target.checked;save(LS.sample,includeSample);rebuild();renderHome();toast(includeSample?"Domande precaricate attive":"Domande precaricate disattivate");};
+$("#toggle26").onchange=e=>{include2026=e.target.checked;save(LS.n26,include2026);rebuild();renderHome();toast(include2026?"Domande AI incluse":"Domande AI escluse");};
+
+/* Modale di conferma */
+let cfCb=null;
+function openConfirm(title,text,onOk){$("#cfTitle").textContent=title;$("#cfText").innerHTML=text;cfCb=onOk;$("#confirm").classList.add("show");}
+function closeConfirm(){$("#confirm").classList.remove("show");cfCb=null;}
+$("#cfNo").onclick=closeConfirm;
+$("#cfYes").onclick=()=>{const cb=cfCb;closeConfirm();if(cb)cb();};
+$("#confirm").onclick=e=>{if(e.target.id==="confirm")closeConfirm();};
+
+/* Danger zone */
+$("#resetResults").onclick=()=>openConfirm("Azzerare i risultati?",
+  "Verranno cancellati <b>storico dei test</b> e <b>domande sbagliate</b>. L'operazione è <b>definitiva</b>: i dati <b>non potranno essere recuperati</b>.",
+  ()=>{history=[];wrongBank=[];save(LS.hist,history);save(LS.wrong,wrongBank);updateBadges();renderProgress();renderWrong();renderHome();toast("Risultati azzerati");});
+$("#resetAll").onclick=()=>openConfirm("Ripristinare tutto?",
+  "Verranno cancellati <b>risultati, statistiche, domande importate e impostazioni</b>. L'operazione è <b>definitiva</b> e le statistiche <b>non potranno più essere ripristinate</b>.",
+  ()=>{[LS.hist,LS.wrong,LS.data,LS.n26,LS.sample,LS.theme].forEach(k=>localStorage.removeItem(k));toast("Ripristino completato");setTimeout(()=>location.reload(),700);});
+
+/* Tema chiaro/scuro */
+let theme=load(LS.theme,"dark");
+function applyTheme(t){
+  theme=t;save(LS.theme,t);
+  document.documentElement.classList.toggle("light",t==="light");
+  const tt=$("#toggleTheme");if(tt)tt.checked=(t==="light");
+  // ricrea i grafici per aggiornare i colori
+  Object.values(charts).forEach(c=>{try{c.dispose()}catch(e){}});charts={};
+  if($("#home").classList.contains("active"))renderHomeChart();
+  if($("#progress").classList.contains("active"))renderStatsCharts();
+  if($("#chapters").classList.contains("active"))renderChapters();
+}
+$("#toggleTheme").onchange=e=>applyTheme(e.target.checked?"light":"dark");
+applyTheme(theme);
+window.addEventListener("resize",()=>Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}}));
+
+/* ID locale (anonimo, salvato solo in questo browser) */
+let uid=load(LS.uid,null);
+if(!uid){uid="u_"+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4);save(LS.uid,uid);}
+$("#uid").textContent=uid;
+$("#uidnote").textContent="È un identificativo casuale salvato solo su questo dispositivo: distingue questo browser, ma non ti identifica altrove.";
+
+/* ---------- INIT ---------- */
+$("#startExam").onclick=startExam;
+$("#startReview").onclick=startReview;
+$("#newQuizBtn").onclick=startExam;
+updateSettingsState();
+renderHome();updateBadges();evaReplace();
+/* Al primo avvio scarica l'archivio completo da GitHub (poi resta in cache, anche offline) */
+autoLoadFull(false).then(ok=>{if(ok){renderHome();evaReplace();}});
+</script>
+</body>
+</html>
