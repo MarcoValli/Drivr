@@ -25,10 +25,10 @@ html.light{
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Blocca lo "swipe indietro" del browser su mobile e il pull-to-refresh */
 html,body{margin:0;height:100%;overscroll-behavior:none;overscroll-behavior-x:none;}
-html{overflow-x:hidden}
+html{overflow-x:hidden;scrollbar-gutter:stable}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:radial-gradient(1200px 600px at 50% -10%,var(--grad) 0%,var(--bg) 55%);
+  background:radial-gradient(1200px 600px at 50% -10%,var(--grad) 0%,var(--bg) 55%) fixed;
   color:var(--txt);display:flex;flex-direction:column;min-height:100%;transition:background .3s,color .3s;
 }
 header{
@@ -48,11 +48,11 @@ nav button:hover{color:var(--txt);background:var(--bg2)}
 nav button.active{color:var(--txt);background:var(--card);border-color:var(--line)}
 nav button .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:9px;
   background:var(--falso);color:#fff;font-size:11px;font-weight:800;text-align:center}
-main{flex:1;display:flex;flex-direction:column;align-items:center;padding:22px 16px 40px;width:100%}
+main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 16px 44px;width:100%}
 .view{width:100%;max-width:760px;display:none;flex-direction:column;align-items:center}
 .view.active{display:flex}
-h2{margin:6px 0 4px;font-size:22px}
-.sub{color:var(--muted);margin:0 0 22px;text-align:center;max-width:560px}
+h2{margin:8px 0 6px;font-size:24px;letter-spacing:-.3px}
+.sub{color:var(--muted);margin:0 0 24px;text-align:center;max-width:560px;line-height:1.5}
 
 /* HOME */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;margin-top:8px}
@@ -62,13 +62,13 @@ h2{margin:6px 0 4px;font-size:22px}
 .tile h3{margin:0 0 6px;font-size:17px}
 .tile p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
 .tile .big{font-size:28px;font-weight:800}
-.stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:18px 0 4px;width:100%}
+.stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:20px 0 8px;width:100%}
 .stat{flex:1;min-width:120px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
 .stat b{display:block;font-size:24px}
 .stat span{color:var(--muted);font-size:12px}
 
 /* QUIZ */
-.quizbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:440px;margin-bottom:14px;gap:12px}
+.quizbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:440px;margin-bottom:16px;gap:12px}
 .progress{flex:1;height:8px;background:var(--bg2);border-radius:8px;overflow:hidden}
 .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
 .counter{font-weight:700;font-size:14px;white-space:nowrap}
@@ -89,14 +89,14 @@ h2{margin:6px 0 4px;font-size:22px}
   border:4px solid;opacity:0;transform:rotate(-12deg);letter-spacing:1px}
 .stamp.v{left:24px;color:var(--vero);border-color:var(--vero)}
 .stamp.f{right:24px;color:var(--falso);border-color:var(--falso)}
-.controls{display:flex;gap:16px;justify-content:center;margin-top:6px}
-.controls button{width:74px;height:74px;border-radius:50%;border:2px solid var(--line);
-  background:var(--bg2);font-size:13px;font-weight:800;cursor:pointer;color:var(--txt);transition:.15s;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.controls{display:flex;gap:14px;justify-content:center;margin-top:12px}
+.controls button{min-width:132px;padding:13px 24px;border-radius:999px;border:2px solid var(--line);
+  background:var(--bg2);font-size:15px;font-weight:800;cursor:pointer;color:var(--txt);transition:.15s;
+  display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:8px}
 .controls .no{border-color:var(--falso);color:var(--falso)}
 .controls .yes{border-color:var(--vero);color:var(--vero)}
-.controls button:hover{transform:scale(1.07)}
-.controls button .k{font-size:18px}
+.controls button:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.controls button svg{width:20px;height:20px}
 .arrow-note{color:var(--muted);font-size:12px;margin-top:10px;text-align:center}
 
 /* EXPLANATION overlay */
@@ -150,7 +150,8 @@ h2{margin:6px 0 4px;font-size:22px}
 .hrow .hscore{text-align:right;font-size:13px;color:var(--muted)}
 .empty{color:var(--muted);text-align:center;padding:40px 10px}
 .empty .em{font-size:40px;margin-bottom:8px}
-.rowbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0 20px}
+.rowbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0 24px}
+#progBtns,#wrongBtns,.rowbtns.left{justify-content:flex-start;width:100%}
 
 /* IMPORT */
 .import-box{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:22px}
@@ -174,7 +175,7 @@ nav .ico{display:none}
 .subtab .badge{position:static;margin-left:6px}
 .subview{width:100%;display:flex;flex-direction:column;align-items:center}
 /* impostazioni */
-.setblock{width:100%;margin-bottom:16px}
+.setblock{width:100%;margin-bottom:18px}
 .setblock h3{margin:0 0 4px;font-size:16px}
 .switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
 .switch-row:last-of-type{border-bottom:none}
@@ -190,6 +191,8 @@ nav .ico{display:none}
 .import-box.danger{border-color:rgba(239,68,68,.4)}
 .import-box.danger h3{color:var(--falso)}
 .btn.danger-btn{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+.btn.ghost.danger{background:transparent;border:1px solid rgba(239,68,68,.55);color:var(--falso)}
+.btn.ghost.danger:hover{background:rgba(239,68,68,.12);border-color:var(--falso)}
 code{background:var(--bg);padding:2px 7px;border-radius:6px;font-size:12px;color:#a5b4fc;font-family:monospace}
 .credits{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;text-align:center;max-width:580px;line-height:1.6}
 .credits a{color:var(--accent)}
@@ -199,6 +202,9 @@ code{background:var(--bg);padding:2px 7px;border-radius:6px;font-size:12px;color
 .chartbox h4{margin:2px 0 6px 6px;font-size:14px;color:var(--muted);font-weight:700}
 .chart{width:100%;height:230px}
 .chart.sm{height:200px}
+.charts-row{display:flex;gap:16px;width:100%;margin:8px 0 16px}
+.charts-row .chartbox{flex:1;min-width:0;margin:0}
+@media(max-width:640px){.charts-row{flex-direction:column}}
 /* capitoli */
 .chaprow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .chaprow .ci{flex:1;min-width:0}
@@ -218,6 +224,8 @@ html.light .stamp.v{color:var(--vero);border-color:var(--vero)}
 @media(max-width:640px){
   .tiles{grid-template-columns:1fr}
   .card .q{font-size:20px}
+  .hero-title{font-size:44px;letter-spacing:-1.5px}
+  .hero .logo{width:64px;height:64px}
   header{padding:12px 16px}
   .brand{font-size:15px}
   .subtabs{max-width:100%}
@@ -251,7 +259,7 @@ header{background:var(--headbg);backdrop-filter:blur(20px) saturate(160%);-webki
 .btn-mini{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn-mini svg{width:16px;height:16px}
 .btn-mini:hover{filter:brightness(1.08)}
-.home-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px;margin-top:10px}
+.home-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px;margin-top:14px}
 .home-actions .btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;font-size:16px;margin:0}
 .home-actions .btn svg{width:19px;height:19px}
 /* ============ TAB BAR IN BASSO (sticky, tutti i dispositivi) ============ */
@@ -270,12 +278,15 @@ nav .lbl{font-size:11px}
 nav button .badge{position:absolute;top:3px;right:6px;margin:0;transform:none}
 main{padding-bottom:110px}
 /* ============ HOME HERO + MICRO-ANIMAZIONE ============ */
-.hero{text-align:center;margin:6px 0 2px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hero{text-align:center;margin:10px 0 2px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.hero .logo{width:78px;height:78px;filter:drop-shadow(0 16px 28px rgba(0,0,0,.35))}
+.hero .logo svg{width:100%;height:100%}
+html.light .hero .logo{filter:drop-shadow(0 14px 24px rgba(190,70,120,.35))}
 .chip{display:inline-block;background:var(--panel);border:1px solid var(--panel-brd);backdrop-filter:blur(8px);
   color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.3px;padding:5px 13px;border-radius:20px}
 .hero-title{font-size:56px;line-height:1;font-weight:900;margin:6px 0 0;letter-spacing:-2px;
   background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.swipe-demo{position:relative;width:220px;height:130px;margin:20px auto 26px;display:flex;align-items:center;justify-content:center}
+.swipe-demo{position:relative;width:220px;height:130px;margin:22px auto 28px;display:flex;align-items:center;justify-content:center}
 .swipe-demo .side{position:absolute;top:50%;transform:translateY(-50%);font-weight:800;font-size:13px;opacity:.55;letter-spacing:.5px}
 .swipe-demo .side.left{left:0;color:var(--falso)}
 .swipe-demo .side.right{right:0;color:var(--vero)}
@@ -335,7 +346,8 @@ main{padding-bottom:110px}
       <button class="btn" id="startExam"><span data-eva="flash-outline"></span> Nuovo quiz</button>
       <button class="btn ghost" id="startReview"><span data-eva="refresh-outline"></span> Ripassa gli errori</button>
     </div>
-    <p class="arrow-note">30 domande casuali · con più di 3 errori sei bocciato.<br>Trascina la scheda o usa le frecce ← → della tastiera.</p>
+    <p class="arrow-note"><span id="qcount"></span>30 domande casuali a test · con più di 3 errori sei bocciato.<br>Trascina la scheda o usa le frecce ← → della tastiera.</p>
+    <div class="chartbox" id="homeChartBox" style="display:none;max-width:560px;margin-top:20px"><h4>Ultimi test — risposte corrette</h4><div class="chart sm" id="homeChart"></div></div>
   </section>
 
   <!-- QUIZ -->
@@ -350,8 +362,8 @@ main{padding-bottom:110px}
     </div>
     <div class="deck" id="deck"></div>
     <div class="controls">
-      <button class="no" id="btnFalso"><span class="k">←</span>FALSO</button>
-      <button class="yes" id="btnVero">VERO<span class="k">→</span></button>
+      <button class="no" id="btnFalso"><span data-eva="arrow-back-outline"></span>FALSO</button>
+      <button class="yes" id="btnVero">VERO<span data-eva="arrow-forward-outline"></span></button>
     </div>
     <p class="arrow-note">← FALSO &nbsp;·&nbsp; VERO → &nbsp;·&nbsp; oppure trascina la scheda</p>
   </section>
@@ -383,8 +395,10 @@ main{padding-bottom:110px}
     <div class="subview" id="sub-stats">
       <p class="sub">Storico dei test (blocchi da 30) in ordine cronologico.</p>
       <div class="stats" id="progStats"></div>
-      <div class="chartbox" id="statTrendBox" style="display:none"><h4>Corrette ed errori per test</h4><div class="chart" id="statTrend"></div></div>
-      <div class="chartbox" id="statDonutBox" style="display:none"><h4>Esiti: promosso vs bocciato</h4><div class="chart sm" id="statDonut"></div></div>
+      <div class="charts-row" id="statChartsRow" style="display:none">
+        <div class="chartbox"><h4>Risposte: corrette vs errate</h4><div class="chart sm" id="statAnsDonut"></div></div>
+        <div class="chartbox"><h4>Esiti: promosso vs bocciato</h4><div class="chart sm" id="statDonut"></div></div>
+      </div>
       <div class="rowbtns" id="progBtns"></div>
       <div class="list" id="progList"></div>
     </div>
@@ -416,11 +430,8 @@ main{padding-bottom:110px}
     </div>
 
     <div class="import-box setblock">
-      <h3>Banche dati</h3>
-      <label class="switch-row">
-        <span class="t">Domande precaricate<small>101 domande ministeriali di prova incluse nell'app</small></span>
-        <span class="sw"><input type="checkbox" id="toggleSample"><span></span></span>
-      </label>
+      <h3>Banca dati</h3>
+      <p class="sub" style="text-align:left;margin:2px 0 6px;font-size:13px">L'archivio ministeriale completo (~7.100 domande) viene scaricato automaticamente al primo avvio da <a href="https://github.com/Ed0ardo/QuizPatenteB" target="_blank" rel="noopener">Ed0ardo/QuizPatenteB</a> e salvato in locale (funziona poi anche offline).</p>
       <label class="switch-row">
         <span class="t">Domande AI “Novità 2026”<small>28 domande scritte con l'AI (angoli ciechi, ADAS, monopattini, smartphone, neopatentati) — non ufficiali</small></span>
         <span class="sw"><input type="checkbox" id="toggle26"><span></span></span>
@@ -443,9 +454,8 @@ main{padding-bottom:110px}
       <h3>Danger zone</h3>
       <p class="sub" style="text-align:left;margin:2px 0 10px;font-size:13px">Il tuo ID locale: <code id="uid">—</code><br><span id="uidnote" style="color:var(--muted)"></span></p>
       <p class="sub" style="text-align:left;margin:0 0 12px;font-size:13px"><b>Attenzione:</b> il ripristino è <b>definitivo</b>. Statistiche, storico dei test e domande sbagliate vengono cancellati e <b>non possono più essere recuperati</b>.</p>
-      <div class="rowbtns" style="margin:0">
-        <button class="btn danger-btn" id="resetResults">Azzera i miei risultati</button>
-        <button class="btn ghost" id="resetAll">Ripristina tutto</button>
+      <div class="rowbtns left" style="margin:0">
+        <button class="btn ghost danger" id="resetAll">Ripristina tutto</button>
       </div>
     </div>
 
@@ -487,111 +497,8 @@ main{padding-bottom:110px}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------- DATASET base (100 domande reali, solo testo) ---------- */
+/* Base per le immagini dell'archivio ministeriale */
 const IMG_BASE="https://raw.githubusercontent.com/Ed0ardo/QuizPatenteB/master";
-const SAMPLE=[
-{t:"Strada",q:"La strada può essere suddivisa in carreggiate",a:true,e:"Esatto: la strada può comprendere una o più carreggiate, oltre a banchine, marciapiedi e piste ciclabili."},
-{t:"Strada",q:"La strada può comprendere le piste ciclabili",a:true,e:"Vero: la strada include tutte le sue parti, comprese le piste ciclabili."},
-{t:"Strada",q:"La strada è aperta alla circolazione dei pedoni, degli animali e dei veicoli",a:true,e:"Definizione corretta: la strada è l'area ad uso pubblico destinata alla circolazione di pedoni, animali e veicoli."},
-{t:"Strada",q:"La strada non comprende le banchine",a:false,e:"Falso: le banchine fanno parte della strada (anche se non della carreggiata)."},
-{t:"Strada",q:"La strada è riservata alla circolazione dei soli autoveicoli e motocicli",a:false,e:"Falso: la strada è aperta anche a pedoni, animali, biciclette e altri veicoli."},
-{t:"Strada",q:"La strada non comprende i marciapiedi",a:false,e:"Falso: i marciapiedi sono parte della strada, destinati ai pedoni."},
-{t:"Autostrada",q:"L'autostrada non ha incroci a raso che l'attraversano",a:true,e:"Vero: l'autostrada non ha intersezioni a raso; gli accessi avvengono con svincoli, corsie di accelerazione e decelerazione."},
-{t:"Autostrada",q:"L'autostrada è dotata di speciali corsie per l'ingresso e l'uscita dei veicoli",a:true,e:"Vero: sono le corsie di accelerazione (ingresso) e decelerazione (uscita)."},
-{t:"Autostrada",q:"I motocicli con cilindrata di almeno 150 cm³ possono circolare in autostrada",a:true,e:"Vero: in autostrada sono ammessi i motocicli con cilindrata di almeno 150 cm³."},
-{t:"Autostrada",q:"L'autostrada deve essere lateralmente recintata",a:true,e:"Vero: l'autostrada è recintata per impedire l'accesso di pedoni, animali e veicoli non ammessi."},
-{t:"Autostrada",q:"Nelle autostrade possono circolare solo le autovetture",a:false,e:"Falso: possono circolare anche autocarri, autobus e motocicli di almeno 150 cm³."},
-{t:"Autostrada",q:"L'autostrada può comprendere piste ciclabili",a:false,e:"Falso: le biciclette non possono circolare in autostrada, che non ha piste ciclabili."},
-{t:"Autostrada",q:"Nelle autostrade possono circolare i ciclomotori e i motocicli fino a 125 cm³",a:false,e:"Falso: servono almeno 150 cm³; i ciclomotori e i motocicli fino a 125 cm³ non sono ammessi."},
-{t:"Carreggiata",q:"La carreggiata può essere suddivisa in corsie",a:true,e:"Vero: la carreggiata può essere divisa in due o più corsie da apposite strisce."},
-{t:"Carreggiata",q:"La carreggiata non comprende i marciapiedi",a:true,e:"Vero: i marciapiedi non fanno parte della carreggiata (sono parte della strada)."},
-{t:"Carreggiata",q:"La carreggiata è la parte della strada destinata normalmente alla circolazione dei veicoli",a:true,e:"Definizione corretta: la carreggiata è la parte della strada destinata allo scorrimento dei veicoli."},
-{t:"Carreggiata",q:"La carreggiata è destinata alla sosta di emergenza",a:false,e:"Falso: la sosta di emergenza avviene sulla corsia di emergenza o sulla banchina, non sulla carreggiata."},
-{t:"Carreggiata",q:"La carreggiata comprende le piazzole di sosta",a:false,e:"Falso: le piazzole di sosta sono esterne alla carreggiata."},
-{t:"Parti carreggiata",q:"Fanno parte della carreggiata gli attraversamenti pedonali",a:true,e:"Vero: gli attraversamenti pedonali e ciclabili fanno parte della carreggiata."},
-{t:"Parti carreggiata",q:"Fanno parte della carreggiata le corsie di emergenza delle autostrade",a:false,e:"Falso: la corsia di emergenza NON fa parte della carreggiata."},
-{t:"Parti carreggiata",q:"Fanno parte della carreggiata le banchine",a:false,e:"Falso: le banchine sono al di fuori della carreggiata."},
-{t:"Parti carreggiata",q:"Fanno parte della carreggiata i marciapiedi",a:false,e:"Falso: i marciapiedi sono riservati ai pedoni e non fanno parte della carreggiata."},
-{t:"Corsia",q:"La corsia è limitata da strisce continue o discontinue",a:true,e:"Vero: la corsia è delimitata da strisce longitudinali continue o discontinue."},
-{t:"Corsia",q:"La corsia può essere riservata alla circolazione di alcune categorie di veicoli (taxi, autobus, ecc.)",a:true,e:"Vero: esistono corsie riservate, ad esempio, a bus e taxi."},
-{t:"Corsia",q:"La corsia è una parte della carreggiata che consente la circolazione di una sola fila di veicoli",a:true,e:"Definizione corretta: la corsia consente la marcia di una sola fila di veicoli."},
-{t:"Corsia",q:"La corsia può essere a doppio senso di circolazione",a:false,e:"Falso: la corsia consente una sola fila di veicoli in un unico senso; è la carreggiata che può essere a doppio senso."},
-{t:"Corsia",q:"Nei centri abitati, su una stessa corsia possono circolare affiancati due motocicli",a:false,e:"Falso: su una corsia può marciare una sola fila di veicoli, quindi non affiancati."},
-{t:"Corsia accelerazione",q:"La corsia di accelerazione facilita l'ingresso dei veicoli in autostrada o su strade extraurbane principali",a:true,e:"Vero: serve ad aumentare la velocità per immettersi in sicurezza."},
-{t:"Corsia accelerazione",q:"La corsia di accelerazione può essere utilizzata per il sorpasso",a:false,e:"Falso: serve solo per immettersi nel flusso, non per sorpassare."},
-{t:"Corsia decelerazione",q:"La corsia di decelerazione facilita l'uscita dei veicoli dall'autostrada",a:true,e:"Vero: consente di rallentare uscendo dal flusso principale."},
-{t:"Corsia decelerazione",q:"La corsia di decelerazione può essere utilizzata per la sosta dei veicoli",a:false,e:"Falso: serve solo per rallentare in uscita, non per sostare."},
-{t:"Banchina",q:"La banchina non consente, di norma, il transito ai veicoli",a:true,e:"Vero: la banchina è esterna alla carreggiata e non è destinata al transito dei veicoli."},
-{t:"Banchina",q:"La banchina è parte della strada, situata oltre la linea bianca continua di margine della carreggiata",a:true,e:"Vero: si trova oltre la striscia di margine della carreggiata."},
-{t:"Banchina",q:"La banchina è parte della carreggiata, destinata alla sosta dei veicoli",a:false,e:"Falso: la banchina è FUORI dalla carreggiata e non è destinata alla sosta ordinaria."},
-{t:"Marciapiede",q:"Il marciapiede è una parte della strada, rialzata o delimitata, riservata ai pedoni",a:true,e:"Definizione corretta: il marciapiede è riservato ai pedoni."},
-{t:"Marciapiede",q:"Il marciapiede è una parte della carreggiata",a:false,e:"Falso: il marciapiede è parte della strada ma non della carreggiata."},
-{t:"Marciapiede",q:"Il marciapiede è una parte della strada riservata anche alle biciclette",a:false,e:"Falso: il marciapiede è riservato ai pedoni, non alle biciclette."},
-{t:"Salvagente",q:"Il salvagente facilita la salita e la discesa dei passeggeri da tram, filobus o autobus",a:true,e:"Vero: il salvagente protegge i pedoni in attesa e in salita/discesa dai mezzi pubblici."},
-{t:"Salvagente",q:"Il salvagente serve a dividere i sensi di marcia in una strada a doppio senso",a:false,e:"Falso: a dividere i sensi di marcia è lo spartitraffico, non il salvagente."},
-{t:"Passo carrabile",q:"Il passo carrabile consente ai veicoli di accedere alle proprietà private laterali alla strada",a:true,e:"Vero: il passo carrabile è l'accesso a proprietà laterali (garage, cortili)."},
-{t:"Passo carrabile",q:"In corrispondenza del passo carrabile è consentita la fermata",a:true,e:"Vero: la fermata (breve, con conducente a bordo) è consentita; è vietata la sosta."},
-{t:"Passo carrabile",q:"In corrispondenza del passo carrabile è consentita la sosta",a:false,e:"Falso: davanti a un passo carrabile la sosta è vietata."},
-{t:"Ciclomotori",q:"I veicoli a due ruote con motore fino a 50 cm³ e velocità massima di 45 km/h sono ciclomotori",a:true,e:"Definizione corretta di ciclomotore: fino a 50 cm³ e non oltre 45 km/h."},
-{t:"Ciclomotori",q:"I ciclomotori sono soggetti a revisione dopo quattro anni dalla prima immatricolazione, poi ogni due anni",a:true,e:"Vero: prima revisione a 4 anni, poi ogni 2 anni."},
-{t:"Ciclomotori",q:"Si definiscono ciclomotori tutti i veicoli a due ruote di cilindrata superiore a 50 cm³",a:false,e:"Falso: oltre i 50 cm³ si tratta di motocicli, non di ciclomotori."},
-{t:"Ciclomotori",q:"I ciclomotori possono circolare alla velocità di 60 km/h fuori dai centri urbani",a:false,e:"Falso: la velocità massima dei ciclomotori è 45 km/h ovunque."},
-{t:"Tricicli",q:"I tricicli a motore sono veicoli a motore a tre ruote simmetriche",a:true,e:"Vero: hanno tre ruote disposte simmetricamente."},
-{t:"Tricicli",q:"I tricicli a motore sono veicoli a motore che possono essere condotti senza patente",a:false,e:"Falso: per guidare un triciclo a motore serve la patente."},
-{t:"Quadricicli",q:"I quadricicli leggeri, ai fini della circolazione, sono assimilati ai ciclomotori",a:true,e:"Vero: i quadricicli leggeri sono equiparati ai ciclomotori."},
-{t:"Quadricicli",q:"I quadricicli sono soggetti a revisione periodica",a:true,e:"Vero: come gli altri veicoli, sono soggetti a revisione."},
-{t:"Quadricicli",q:"I quadricicli diversi da quelli leggeri possono essere guidati senza patente",a:false,e:"Falso: per i quadricicli non leggeri serve la patente."},
-{t:"Comportamento",q:"Il conducente deve tenere un rapporto corretto e tollerante verso gli altri utenti della strada",a:true,e:"Vero: correttezza e tolleranza sono doveri del conducente."},
-{t:"Comportamento",q:"Avvicinandosi a un incrocio il conducente deve sempre usare la massima prudenza, anche se ha la precedenza",a:true,e:"Vero: la prudenza va usata sempre, anche avendo diritto di precedenza."},
-{t:"Comportamento",q:"Il conducente deve cercare di prevedere il comportamento degli altri utenti",a:true,e:"Vero: la guida sicura richiede di anticipare le mosse altrui."},
-{t:"Comportamento",q:"Il diritto di precedenza non autorizza ad attraversare l'incrocio senza usare prudenza",a:true,e:"Vero: la precedenza non esime dall'obbligo di prudenza."},
-{t:"Comportamento",q:"Il conducente di un veicolo di grandi dimensioni ha, di norma, la precedenza su quello di un veicolo più piccolo",a:false,e:"Falso: la precedenza dipende dalle regole della strada, non dalla dimensione del veicolo."},
-{t:"Comportamento",q:"Il conducente deve rispettare gli agenti del traffico solo se sono in divisa",a:false,e:"Falso: gli agenti del traffico vanno sempre rispettati, anche i loro segnali."},
-{t:"Comportamento",q:"Il conducente deve dare segni di impazienza se il veicolo davanti procede troppo lentamente",a:false,e:"Falso: bisogna essere pazienti e tolleranti, mai aggressivi."},
-{t:"Attenzione",q:"Un incidente, anche a bassa velocità, può creare gravi problemi fisici a pedoni, ciclisti e motociclisti",a:true,e:"Vero: gli utenti deboli sono vulnerabili anche a basse velocità."},
-{t:"Attenzione",q:"Prima di aprire lo sportello bisogna controllare che non sopraggiungano ciclisti o motociclisti",a:true,e:"Vero: aprire lo sportello senza guardare può causare gravi incidenti."},
-{t:"Attenzione",q:"I montanti interni degli autoveicoli riducono la possibilità di vedere un ciclista o un motociclista",a:true,e:"Vero: i montanti creano angoli ciechi che nascondono gli utenti deboli."},
-{t:"Attenzione",q:"Un incidente a bassa velocità non crea problemi di incolumità ai conducenti coinvolti",a:false,e:"Falso: anche a bassa velocità un incidente può causare danni fisici."},
-{t:"Attenzione",q:"Il conducente di un motociclo può fare lo slalom tra i veicoli fermi al semaforo",a:false,e:"Falso: lo slalom tra i veicoli è pericoloso e vietato."},
-{t:"Attenzione",q:"Il conducente del motociclo può parcheggiare sul marciapiede anche senza appositi spazi",a:false,e:"Falso: si può sostare solo negli spazi consentiti, non sul marciapiede."},
-{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti delle persone anziane",a:true,e:"Vero: gli anziani sono utenti più vulnerabili e con riflessi più lenti."},
-{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei bambini che attraversano la strada",a:true,e:"Vero: i bambini hanno comportamenti imprevedibili."},
-{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei conducenti che dimostrano una guida incerta",a:true,e:"Vero: una guida incerta segnala possibili manovre improvvise."},
-{t:"Prudenza",q:"Bisogna usare particolare prudenza verso chi ha conseguito la patente in uno Stato estero",a:false,e:"Falso: la maggiore prudenza va usata verso gli utenti deboli, non in base al Paese della patente."},
-{t:"Prudenza",q:"Bisogna usare maggiore prudenza nei confronti dei conducenti di autoveicoli elettrici",a:false,e:"Falso: l'alimentazione del veicolo non richiede prudenza particolare."},
-{t:"Anziani",q:"Le persone anziane che attraversano potrebbero fermarsi improvvisamente al centro della strada",a:true,e:"Vero: gli anziani possono avere reazioni lente o incerte."},
-{t:"Anziani",q:"Gli anziani sono più esposti perché potrebbero valutare male la velocità dei veicoli",a:true,e:"Vero: capacità visive e uditive ridotte aumentano il rischio."},
-{t:"Anziani",q:"Quando gli anziani attraversano hanno riflessi più rapidi e attraversano con più accortezza",a:false,e:"Falso: gli anziani hanno riflessi più lenti, quindi serve più prudenza."},
-{t:"Anziani",q:"Quando gli anziani attraversano bisogna lampeggiare e suonare il clacson per farli attraversare rapidamente",a:false,e:"Falso: suonare o lampeggiare li spaventa; bisogna attendere con pazienza."},
-{t:"Precedenza pedoni",q:"Il conducente deve fermarsi e dare la precedenza al pedone non vedente col bastone bianco che attraversa fuori dalle strisce",a:true,e:"Vero: al non vedente col bastone bianco va data sempre la precedenza."},
-{t:"Precedenza pedoni",q:"Va data la precedenza al pedone col bastone bianco anche se non accompagnato da cane guida",a:true,e:"Vero: la precedenza è dovuta indipendentemente dalla presenza del cane guida."},
-{t:"Precedenza pedoni",q:"Il conducente deve accelerare per sgombrare la carreggiata quando un non vedente col bastone bianco attraversa",a:false,e:"Falso: bisogna fermarsi e dargli la precedenza, mai accelerare."},
-{t:"Precedenza pedoni",q:"Bisogna dare la precedenza al non vedente col bastone bianco solo se le strisce distano oltre 100 metri",a:false,e:"Falso: la precedenza è sempre dovuta, senza condizioni di distanza."},
-{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, il pedone può diventare insicuro e tornare improvvisamente indietro",a:true,e:"Vero: bisogna prevedere movimenti improvvisi dei pedoni."},
-{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, i pedoni (specie i bambini) possono sbucare tra i veicoli parcheggiati",a:true,e:"Vero: i veicoli in sosta riducono la visibilità e i pedoni possono comparire all'improvviso."},
-{t:"Vicinanza pedoni",q:"Vicino a un attraversamento, il conducente deve accelerare quel tanto che basta per passare davanti al pedone",a:false,e:"Falso: bisogna dare la precedenza al pedone, non tentare di precederlo."},
-{t:"Vicinanza pedoni",q:"Se il pedone si è fermato in mezzo alle strisce significa che ha rinunciato a passare",a:false,e:"Falso: potrebbe ripartire da un momento all'altro; bisogna aspettarlo."},
-{t:"Semaforo bambini",q:"Con bambini fermi al semaforo serve prudenza: potrebbero attraversare col rosso ritenendo che duri troppo",a:true,e:"Vero: i bambini possono attraversare in modo imprevedibile."},
-{t:"Semaforo bambini",q:"Con bambini al semaforo bisogna considerare che possono spingersi finendo sulla carreggiata",a:true,e:"Vero: i bambini possono spingersi tra loro e invadere la strada."},
-{t:"Semaforo bambini",q:"Dopo la luce verde il conducente deve attendere che i pedoni abbiano finito di attraversare",a:true,e:"Vero: prima di ripartire occorre lasciar completare l'attraversamento ai pedoni."},
-{t:"Semaforo bambini",q:"Con bambini al semaforo si è certi che attraversino solo col verde pedonale",a:false,e:"Falso: i bambini sono imprevedibili e potrebbero attraversare col rosso."},
-{t:"Scuolabus",q:"Vicino a una fermata di scuolabus occorre fare attenzione ai bambini nascosti dall'autobus",a:true,e:"Vero: i bambini possono attraversare nascosti dall'autobus fermo."},
-{t:"Scuolabus",q:"Vicino a una fermata di scuolabus occorre prepararsi a frenare se dei bambini attraversano improvvisamente",a:true,e:"Vero: bisogna rallentare ed essere pronti a fermarsi."},
-{t:"Scuolabus",q:"Vicino a una fermata di scuolabus non si deve rallentare per non ostacolare gli altri veicoli",a:false,e:"Falso: la sicurezza dei bambini viene prima; bisogna rallentare."},
-{t:"Scuolabus",q:"Vicino a una fermata di scuolabus si ha sempre la precedenza sui bambini che attraversano",a:false,e:"Falso: i pedoni, specie i bambini, hanno la precedenza sulle strisce."},
-{t:"Taxi",q:"Vicino a un posteggio di taxi bisogna fare attenzione ai pedoni che salgono o scendono dal taxi",a:true,e:"Vero: intorno ai taxi ci sono pedoni che salgono e scendono."},
-{t:"Taxi",q:"Un veicolo diverso dai taxi non può sostare nei posteggi riservati ai taxi",a:true,e:"Vero: i posteggi taxi sono riservati e vietati agli altri veicoli."},
-{t:"Taxi",q:"Un veicolo diverso dai taxi può sostare nei posteggi riservati ai taxi dalle 20.00 alle 8.00",a:false,e:"Falso: il divieto vale sempre, senza fasce orarie."},
-{t:"Ciclisti",q:"Per sorpassare ciclisti o pedoni sulla carreggiata è prudente mantenere un'adeguata distanza laterale",a:true,e:"Vero: serve una distanza di sicurezza laterale sufficiente."},
-{t:"Ciclisti",q:"Non è prudente sorpassare ciclisti o pedoni se non si può mantenere una distanza laterale sufficiente",a:true,e:"Vero: senza spazio laterale adeguato il sorpasso va evitato."},
-{t:"Ciclisti",q:"È vietato sorpassare ciclisti o pedoni che occupano la carreggiata",a:false,e:"Falso: il sorpasso è consentito con prudenza e adeguata distanza, non vietato in assoluto."},
-{t:"Ciclisti",q:"Di notte non si deve dare la precedenza ai pedoni che attraversano sulle strisce",a:false,e:"Falso: la precedenza ai pedoni sulle strisce va data sempre, anche di notte."},
-{t:"Gravidanza",q:"Il conducente deve consentire a una donna incinta di attraversare senza metterle fretta",a:true,e:"Vero: verso le donne incinte serve maggiore prudenza e pazienza."},
-{t:"Gravidanza",q:"Bisogna usare maggiore prudenza verso i pedoni che spingono una carrozzina per bambini",a:true,e:"Vero: chi spinge una carrozzina è più lento e va tutelato."},
-{t:"Gravidanza",q:"È vietato ostruire con la sosta gli scivoli del marciapiede per non impedire il passaggio delle carrozzine",a:true,e:"Vero: gli scivoli servono a carrozzine e persone con disabilità e non vanno ostruiti."},
-{t:"Gravidanza",q:"Una donna incinta che attraversa ha il passo più rapido e quindi attraversa velocemente",a:false,e:"Falso: di norma attraversa più lentamente; serve più prudenza e pazienza."},
-{t:"Gravidanza",q:"È consentito lasciare il veicolo in sosta sul marciapiede senza lasciare spazio a chi spinge una carrozzina",a:false,e:"Falso: bisogna sempre lasciare lo spazio ai pedoni; ostruire il marciapiede è vietato."}
-];
 
 /* ---------- Pacchetto "Novità 2026" — domande scritte da me (AI), NON ufficiali ----------
    Basate sul Nuovo Codice della Strada (in vigore dal 14/12/2024) e sui nuovi temi d'esame
@@ -629,7 +536,7 @@ const NOVITA2026=[
 ];
 
 /* ---------- STATE / STORAGE ---------- */
-const LS={hist:"ppb_history",wrong:"ppb_wrong",data:"ppb_data",n26:"ppb_novita2026",sample:"ppb_sample",uid:"ppb_uid",theme:"ppb_theme"};
+const LS={hist:"ppb_history",wrong:"ppb_wrong",data:"ppb_data",n26:"ppb_novita2026",uid:"ppb_uid",theme:"ppb_theme"};
 /* Sorgenti dell'archivio ministeriale completo (provate in ordine).
    Metti un file "domande.json" nella cartella per usare la tua copia offline;
    altrimenti l'app scarica l'archivio completo da GitHub al primo avvio. */
@@ -638,7 +545,6 @@ const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
 let imported = load(LS.data,[]);               // archivio importato/auto-scaricato (accumula)
-let includeSample = load(LS.sample,true);      // domande precaricate (SAMPLE)
 let include2026 = load(LS.n26,true);           // pacchetto Novità 2026 (AI)
 let ALL = buildPool();
 let history = load(LS.hist,[]);
@@ -646,16 +552,14 @@ let wrongBank = load(LS.wrong,[]);   // {q,a,e,t,img,src}
 const BLOCK=30, MAX_ERR=3;
 
 function buildPool(){
-  let pool=[];
-  if(includeSample) pool=pool.concat(SAMPLE);
-  pool=pool.concat(imported);
+  let pool=imported.slice();
   if(include2026) pool=pool.concat(NOVITA2026);
   const seen=new Set(), out=[];
   for(const q of pool){const k=(q.q||"").trim().toLowerCase();if(!k||seen.has(k))continue;seen.add(k);out.push({...q,src:q.src||"min"});}
   return out;
 }
 function poolCounts(){
-  return {sample:includeSample?SAMPLE.length:0, imported:imported.length, ai:include2026?NOVITA2026.length:0, total:ALL.length};
+  return {imported:imported.length, ai:include2026?NOVITA2026.length:0, total:ALL.length};
 }
 function rebuild(){ALL=buildPool();updateBadges();updateSettingsState();}
 function srcLabelHTML(q){
@@ -675,6 +579,8 @@ function imgUrl(q){return q.img?(q.img.startsWith("http")?q.img:IMG_BASE+q.img):
 
 /* ---------- NAV ---------- */
 function show(v){
+  // se entro nel Quiz senza una sessione in corso, ne avvio subito una nuova
+  if(v==="quiz" && !(queue.length && idx<queue.length)){ startExam(); return; }
   $$(".view").forEach(x=>x.classList.remove("active"));
   $("#"+(v==="result"?"resultView":v)).classList.add("active");
   $$("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
@@ -700,7 +606,7 @@ function updateBadges(){
     const b=$(sel);if(!b)return;
     if(wrongBank.length){b.style.display=disp;b.textContent=wrongBank.length;}else b.style.display="none";
   });
-  const qc=$("#qcount");if(qc)qc.textContent="· "+ALL.length+" domande";
+  const qc=$("#qcount");if(qc)qc.textContent=ALL.length?ALL.length+" domande in gioco · ":"";
 }
 
 /* ---------- QUIZ ENGINE ---------- */
@@ -727,7 +633,7 @@ function startReview(){
   beginSession("review");
 }
 function beginSession(m){
-  mode=m;idx=0;good=0;bad=0;sessionWrong=[];
+  mode=m;idx=0;good=0;bad=0;sessionWrong=[];answering=false;
   show("quiz");setQuizMode();renderCard();updateBar();
 }
 function updateBar(){
@@ -735,7 +641,9 @@ function updateBar(){
   $("#qcounter").innerHTML=`${Math.min(idx+1,queue.length)} / ${queue.length} · <span class="err">${bad} err</span>`;
 }
 function renderCard(){
-  const deck=$("#deck");deck.innerHTML="";
+  const deck=$("#deck");
+  deck.querySelectorAll(".card").forEach(c=>{if(c._cleanup)c._cleanup();});
+  deck.innerHTML="";
   if(idx>=queue.length){finish();return;}
   // render current + next (peek) for depth
   const q=queue[idx];
@@ -752,7 +660,10 @@ function renderCard(){
   attachDrag(card);
   updateBar();
 }
+let answering=false; // evita doppie risposte durante l'animazione
 function answer(val){ // val=true(vero)/false(falso)
+  if(answering||idx>=queue.length)return;
+  answering=true;
   const q=queue[idx];
   const correct=(val===q.a);
   if(correct){good++;}
@@ -768,7 +679,7 @@ function answer(val){ // val=true(vero)/false(falso)
     card.style.opacity="0";
   }
   setTimeout(()=>{
-    idx++;
+    idx++;answering=false;
     if(!correct){ showExpl(q,val); }
     else { renderCard(); }
   },300);
@@ -937,8 +848,8 @@ function addImported(list){        // aggiunge al set esistente (import manuale)
 function updateSettingsState(){
   const el=$("#importState");if(!el)return;
   const c=poolCounts();
-  el.innerHTML=`In gioco: <b>${c.total}</b> domande &nbsp;·&nbsp; precaricate ${c.sample} · importate ${c.imported} · AI ${c.ai}`;
-  const ts=$("#toggleSample"),tg2=$("#toggle26");if(ts)ts.checked=includeSample;if(tg2)tg2.checked=include2026;
+  el.innerHTML=`In gioco: <b>${c.total}</b> domande &nbsp;·&nbsp; archivio ${c.imported} · AI ${c.ai}`;
+  const tg2=$("#toggle26");if(tg2)tg2.checked=include2026;
 }
 function normalize(j){
   return Array.isArray(j)
@@ -998,21 +909,21 @@ function renderHomeChart(){
   ch.resize();
 }
 function renderStatsCharts(){
-  const tBox=$("#statTrendBox"),dBox=$("#statDonutBox"),c=cTheme();
-  if(!history.length){tBox.style.display="none";dBox.style.display="none";return;}
-  tBox.style.display="block";dBox.style.display="block";
-  const last=history.slice(-15),base=history.length-last.length;
-  const t=getChart("statTrend");
-  if(t){t.setOption({grid:{left:34,right:14,top:34,bottom:24},tooltip:{trigger:"axis"},legend:{data:["Corrette","Errori"],top:0,textStyle:{color:c.muted}},
-    xAxis:{type:"category",data:last.map((h,i)=>"#"+(base+i+1)),axisLabel:{color:c.muted},axisLine:{lineStyle:{color:c.line}}},
-    yAxis:{type:"value",splitLine:{lineStyle:{color:c.line}},axisLabel:{color:c.muted}},
-    series:[{name:"Corrette",type:"bar",stack:"s",data:last.map(h=>h.good),itemStyle:{color:c.vero}},
-            {name:"Errori",type:"bar",stack:"s",data:last.map(h=>h.err),itemStyle:{color:c.falso,borderRadius:[3,3,0,0]}}]});t.resize();}
+  const row=$("#statChartsRow"),c=cTheme();
+  if(!history.length){if(row)row.style.display="none";return;}
+  row.style.display="flex";
+  const donut=(chart,data)=>{if(!chart)return;chart.setOption({tooltip:{trigger:"item"},legend:{bottom:0,textStyle:{color:c.muted}},
+    series:[{type:"pie",radius:["45%","70%"],center:["50%","44%"],label:{color:c.txt},labelLine:{lineStyle:{color:c.line}},data}]});chart.resize();};
+  // Donut 1 — risposte totali: corrette vs errate
+  const totGood=history.reduce((s,h)=>s+h.good,0),totErr=history.reduce((s,h)=>s+h.err,0);
+  donut(getChart("statAnsDonut"),[
+    {value:totGood,name:"Corrette",itemStyle:{color:c.vero}},
+    {value:totErr,name:"Errate",itemStyle:{color:c.falso}}]);
+  // Donut 2 — esiti: promosso vs bocciato
   const passed=history.filter(h=>h.err<=MAX_ERR).length,failed=history.length-passed;
-  const d=getChart("statDonut");
-  if(d){d.setOption({tooltip:{trigger:"item"},legend:{bottom:0,textStyle:{color:c.muted}},
-    series:[{type:"pie",radius:["45%","70%"],center:["50%","44%"],label:{color:c.txt},labelLine:{lineStyle:{color:c.line}},
-      data:[{value:passed,name:"Promosso",itemStyle:{color:c.vero}},{value:failed,name:"Bocciato",itemStyle:{color:c.falso}}]}]});d.resize();}
+  donut(getChart("statDonut"),[
+    {value:passed,name:"Promosso",itemStyle:{color:c.vero}},
+    {value:failed,name:"Bocciato",itemStyle:{color:c.falso}}]);
 }
 function renderChapters(){
   const list=$("#chapList"),box=$("#chapChartBox"),c=cTheme();const st=chapterStats();
@@ -1050,7 +961,8 @@ async function autoLoadFull(force){
       if(list.length>200){ setImported(list); toast("Archivio completo: "+list.length+" domande"); return true; }
     }catch(e){/* provo la prossima sorgente */}
   }
-  updateSettingsState(); // fetch fallito (es. aperto da file:// in locale): resto sul set precaricato
+  updateSettingsState(); // fetch fallito (es. aperto da file:// in locale)
+  if(!imported.length) toast("Archivio non scaricabile ora: apri l'app via http/https");
   return false;
 }
 function handleFile(file){
@@ -1068,8 +980,7 @@ fi.onchange=e=>{if(e.target.files[0])handleFile(e.target.files[0]);};
 ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
 drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
 
-/* toggle banche dati */
-$("#toggleSample").onchange=e=>{includeSample=e.target.checked;save(LS.sample,includeSample);rebuild();renderHome();toast(includeSample?"Domande precaricate attive":"Domande precaricate disattivate");};
+/* toggle banca dati AI */
 $("#toggle26").onchange=e=>{include2026=e.target.checked;save(LS.n26,include2026);rebuild();renderHome();toast(include2026?"Domande AI incluse":"Domande AI escluse");};
 
 /* Modale di conferma */
@@ -1081,12 +992,9 @@ $("#cfYes").onclick=()=>{const cb=cfCb;closeConfirm();if(cb)cb();};
 $("#confirm").onclick=e=>{if(e.target.id==="confirm")closeConfirm();};
 
 /* Danger zone */
-$("#resetResults").onclick=()=>openConfirm("Azzerare i risultati?",
-  "Verranno cancellati <b>storico dei test</b> e <b>domande sbagliate</b>. L'operazione è <b>definitiva</b>: i dati <b>non potranno essere recuperati</b>.",
-  ()=>{history=[];wrongBank=[];save(LS.hist,history);save(LS.wrong,wrongBank);updateBadges();renderProgress();renderWrong();renderHome();toast("Risultati azzerati");});
 $("#resetAll").onclick=()=>openConfirm("Ripristinare tutto?",
-  "Verranno cancellati <b>risultati, statistiche, domande importate e impostazioni</b>. L'operazione è <b>definitiva</b> e le statistiche <b>non potranno più essere ripristinate</b>.",
-  ()=>{[LS.hist,LS.wrong,LS.data,LS.n26,LS.sample,LS.theme].forEach(k=>localStorage.removeItem(k));toast("Ripristino completato");setTimeout(()=>location.reload(),700);});
+  "Verranno cancellati <b>risultati, statistiche, domande importate e impostazioni</b>. L'operazione è <b>definitiva</b>: i dati <b>non potranno essere recuperati</b>.",
+  ()=>{[LS.hist,LS.wrong,LS.data,LS.n26,LS.theme].forEach(k=>localStorage.removeItem(k));localStorage.removeItem("ppb_sample");toast("Ripristino completato");setTimeout(()=>location.reload(),700);});
 
 /* Tema chiaro/scuro */
 let theme=load(LS.theme,"dark");
