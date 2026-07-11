@@ -16,7 +16,7 @@
 /* Tema chiaro — palette basata su #FFC1D7 */
 html.light{
   --bg:#fff5f8; --bg2:#ffe7f0; --card:#ffffff; --card2:#fff0f6;
-  --txt:#3a2530; --muted:#9a7b88; --line:#f6d0e0;
+  --txt:#3a2530; --muted:#7a5462; --line:#f6d0e0;
   --vero:#16a34a; --falso:#e11d6b; --accent:#ec4899; --accent2:#c026d3;
   --gold:#d97706; --grad:#ffc1d7; --imgbg:#ffffff;
   --panel:rgba(255,255,255,.55); --panel-brd:rgba(255,255,255,.75); --panel-hi:rgba(255,255,255,.4);
@@ -25,12 +25,15 @@ html.light{
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Blocca lo "swipe indietro" del browser su mobile e il pull-to-refresh */
 html,body{margin:0;height:100%;overscroll-behavior:none;overscroll-behavior-x:none;}
-html{overflow-x:hidden;scrollbar-gutter:stable}
+html{overflow-x:hidden;scrollbar-gutter:stable;background:var(--bg)}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:radial-gradient(1200px 600px at 50% -10%,var(--grad) 0%,var(--bg) 55%) fixed;
+  background:var(--bg);
   color:var(--txt);display:flex;flex-direction:column;min-height:100%;transition:background .3s,color .3s;
 }
+/* livello di sfondo fisso: glow statico che non scorre né glitcha su mobile */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(1200px 600px at 50% -10%,var(--grad) 0%,var(--bg) 55%);transition:background .3s;}
 header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(15,18,32,.6);
@@ -221,6 +224,15 @@ html.light .result{box-shadow:0 24px 48px -28px rgba(190,70,120,.4)}
 html.light .toast{box-shadow:0 12px 30px -8px rgba(190,70,120,.35)}
 html.light nav button.active{color:#fff}
 html.light .stamp.v{color:var(--vero);border-color:var(--vero)}
+/* --- contrasti tema chiaro: testi/colori nati per il tema scuro, resi leggibili su fondo chiaro --- */
+html.light .expl-box .why{color:var(--txt)}
+html.light .import-box ol{color:#5a3b47}
+html.light code{color:#a21b63;background:#fff0f6}
+html.light .srclab.min{background:rgba(157,23,77,.12);color:#9d174d}
+html.light .srclab.ai{background:rgba(180,83,9,.14);color:#8a4a08}
+html.light .disclaimer{color:#8a4a08;background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.3)}
+html.light .expl-box .why{background:var(--bg2)}
+html.light .credits{color:#6f4d5b}
 @media(max-width:640px){
   .tiles{grid-template-columns:1fr}
   .hero-title{font-size:44px;letter-spacing:-1.5px}
@@ -327,8 +339,8 @@ nav button.active .ico{animation:tabIco .42s cubic-bezier(.34,1.56,.64,1)}
 /* fade-in dolce al cambio schermata */
 .view.active{animation:viewIn .32s ease both}
 @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-/* entrata della card del quiz */
-.deck .card{animation:cardIn .3s cubic-bezier(.2,.8,.3,1) both}
+/* entrata della card del quiz (backwards: non congela il transform, così lo swipe col dito funziona) */
+.deck .card{animation:cardIn .3s cubic-bezier(.2,.8,.3,1) backwards}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 /* rifiniture pulsanti */
 .btn,.btn-mini{transition:transform .12s ease, filter .2s ease, box-shadow .2s ease}
